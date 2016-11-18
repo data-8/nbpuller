@@ -72,6 +72,7 @@ class LandingHandler(RequestHandler):
         util.logger.info("authenticate returned: {}".format(redirection))
         is_redirect = (redirection.startswith('/') or
                        redirection.startswith('http'))
+
         if is_redirect:
             values = []
             for k, v in args.items():
