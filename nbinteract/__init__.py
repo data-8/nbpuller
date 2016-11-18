@@ -1,3 +1,6 @@
+import json
+from notebook.utils import url_path_join
+from notebook.base.handlers import IPythonHandler
 
 # from nbresuse.handlers import <some handler function>
 # Jupyter Extension points
