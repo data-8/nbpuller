@@ -9,6 +9,7 @@ import json
 from operator import xor
 from concurrent.futures import ThreadPoolExecutor
 from notebook.utils import url_path_join
+from nbinteract.config import config_for_env
 
 from tornado import gen
 from tornado.options import define, options
