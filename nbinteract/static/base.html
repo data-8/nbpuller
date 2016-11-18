@@ -1,0 +1,24 @@
+<html>
+    <head>
+        <title>Data 8 Interact Server</title>
+        <link rel="stylesheet"
+              href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+              integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7"
+              crossorigin="anonymous" />
+        <script src="//code.jquery.com/jquery-2.2.2.min.js"
+                integrity="sha256-36cp2Co+/62rEAAYHLmRCPIych47CvdM+uTBJwSzWjI="
+                crossorigin="anonymous"></script>
+        <link rel="stylesheet"
+              href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+        <link
+                href='//fonts.googleapis.com/css?family=Work+Sans:300,400,700|Raleway:300,700' rel='stylesheet' type='text/css'>
+        <link href="{{ static_url("style.css") }}" rel="stylesheet" />
+        <script type="text/javascript" src="{{ static_url("script.js") }}"></script>
+    </head>
+    <body>
+        {% block body %}
+        {% end %}
+    </body>
+    {% block postbody %}
+    {% end %}
+</html>
