@@ -144,7 +144,6 @@ class RequestHandler(WebSocketHandler):
             self.write_message(message)
 
 def setup_handlers(web_app):
-    web_app = nbapp.web_app
     env_name = 'production'
     config = config_for_env(env_name)
     define('config', config)
