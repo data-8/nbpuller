@@ -1,4 +1,4 @@
-from app.config import config_for_env
+from config import config_for_env
 from tornado.options import define
 from nbinteract.handlers import LandingHandler
 from notebook.utils import url_path_join
