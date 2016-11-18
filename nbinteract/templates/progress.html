@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block body %}
+<main class="progress-content">
+    <p><i class="fa fa-refresh fa-spin fa-3x fa-fw"></i></p>
+    <h1>Data8 Interact Server</h1>
+    <h2> Please use Google Chrome to avoid any errors! </h2>
+    <p class="reversed">Est. time left: <span class="time">30 seconds</span>
+        &middot;
+    Status:
+        <span class="status">Working...</span></p>
+    <p><a href="#" class="button console_log">Hide Console Log</a></p>
+    <div class="col-md-2"></div>
+    <pre class="log-container col-md-8"><code class="log">There are no logs to show.</code></pre>
+</main>
+{% end %}
+
+{% block postbody %}
+<script>
+    $(document).ready(function() {
+        openStatusSocket({% raw socket_args %});
+    });
+</script>
+{% end %}

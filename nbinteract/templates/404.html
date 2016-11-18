@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block body %}
+<main class="done-content">
+    <p><i class="done-icon fa fa-thumbs-down"></i></p>
+    <h1>Data8 Interact Server</h1>
+    <p>Looks like your request was malformed. It must contain either the file
+        param <br>
+        <a href="http://localhost:8002/?file=http://localhost:8000/test.ipynb">
+            <code>http://localhost:8002/?file=http://localhost:8000/test.ipynb</code>
+        </a>
+        or both the repo and path params. <br>
+        <a href="http://localhost:8002/?repo=data8assets&path=labs/lab01">
+            <code>http://localhost:8002/?repo=data8assets&path=labs/lab01</code>
+        </a>
+    </p>
+    <p><a href="http://data8.org" class="button">back to Data8</a></p>
+</main>
+{% end %}

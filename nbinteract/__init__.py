@@ -1,8 +1,5 @@
-import json
-from notebook.utils import url_path_join
-from notebook.base.handlers import IPythonHandler
+from nbinteract.handlers import LandingHandler
 
-# from nbresuse.handlers import <some handler function>
 # Jupyter Extension points
 def _jupyter_server_extension_paths():
     return [{
@@ -17,10 +14,6 @@ def _jupyter_nbextension_paths():
         "require": "nbinteract/main"
     }]
 
-class HelloWorldHandler(IPythonHandler):
-    def get(self):
-        self.finish('Hello, world!')
-
 def load_jupyter_server_extension(nbapp):
     """
     Called when the extension is loaded.
@@ -30,5 +23,5 @@ def load_jupyter_server_extension(nbapp):
     """
     web_app = nbapp.web_app
     host_pattern = '.*$'
-    route_pattern = url_path_join(web_app.settings['base_url'], '/hello')
-    web_app.add_handlers(host_pattern, [(route_pattern, HelloWorldHandler)])
+    route_pattern = url_path_join(web_app.settings['base_url'], '/interact')
+    web_app.add_handlers(host_pattern, [(route_pattern, LandingHandler)])

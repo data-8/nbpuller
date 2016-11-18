@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Data8 Interact Server</h1>
+<div class="col-md-2"></div>
+<section class="options col-md-8">
+    <div class="half col-md-6">
+        <i class="half-icon fa fa-book" aria-hidden="true"></i>
+        <h2>Self-Study</h2>
+        <p>Click below to download the contents of this resource directly.
+            <span> Please use Google Chrome to avoid any issues. </span></p>
+        {% for download_link in download_links %}
+        <a class="button" href="{{ download_link }}">Download {{
+            download_link.split('/')[-1] }}</a>
+        {% end %}
+    </div>
+    <div class="half col-md-6">
+        <i class="half-icon fa fa-graduation-cap" aria-hidden="true"></i>
+        <h2>Enrolled</h2>
+        <p>Click below to authenticate to JupyterHub and
+            add this resource to your JupyterHub workspace.</p>
+        <a class="button" href="{{ authenticate_link }}">Authenticate
+        </a>
+    </div>
+    <div class="server-input col-md-12">
+        <p>Or, use a different DS8 Interact server.</p>
+        <form>
+            <input class="server-field" placeholder="ds8.berkeley.edu">
+        </form>
+        <p class="reversed">http://<span class="server-display">ds8.berkeley.edu</span>/?{{
+            query
+            }}</p>
+        <p><a href="#" class="button server-button">Go to
+            <span class="server-display">Server</span></a></p>
+    </div>
+</section>
+{% end %}
