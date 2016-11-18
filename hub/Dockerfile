@@ -4,7 +4,7 @@ RUN apt-get update
 RUN apt-get install -y --no-install-recommends python3 python3-pip ca-certificates git nginx-extras lua-cjson
 
 RUN pip3 install --upgrade pip
-RUN pip3 --no-cache-dir install jupyterhub requests-futures jupyterhub-dummyauthenticator
+RUN pip3 --no-cache-dir install jupyterhub requests-futures jupyterhub-dummyauthenticator pytest webargs requests gitpython toolz
 RUN jupyter nbextension install --py helpful_package
 
 RUN pip3 --no-cache-dir install git+https://github.com/data-8/kubespawner.git@volumes
