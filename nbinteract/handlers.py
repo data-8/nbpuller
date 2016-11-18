@@ -8,9 +8,10 @@
 import json
 from operator import xor
 from concurrent.futures import ThreadPoolExecutor
+from notebook.utils import url_path_join
 
 from tornado import gen
-from tornado.options import options
+from tornado.options import define, options
 from tornado.web import RequestHandler
 from tornado.websocket import WebSocketHandler
 from webargs import fields
@@ -141,3 +142,16 @@ class RequestHandler(WebSocketHandler):
             message = messages.error(str(e))
             util.logger.error('Sent message: {}'.format(message))
             self.write_message(message)
+
+def setup_handlers(web_app):
+    web_app = nbapp.web_app
+    env_name = 'production'
+    config = config_for_env(env_name)
+    define('config', config)
+
+    host_pattern = '.*'
+    route_pattern = url_path_join(web_app.settings['base_url'], '/interact')
+    web_app.add_handlers(host_pattern, [(route_pattern, LandingHandler),(route_pattern + '/', LandingHandler)])
+
+
+

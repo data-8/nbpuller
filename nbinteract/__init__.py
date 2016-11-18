@@ -1,7 +1,4 @@
-from config import config_for_env
-from tornado.options import define
-from nbinteract.handlers import LandingHandler
-from notebook.utils import url_path_join
+from nbinteract.handlers import setup_handlers
 
 def _jupyter_server_extension_paths():
     return [{
@@ -17,12 +14,4 @@ def _jupyter_nbextension_paths():
     }]
 
 def load_jupyter_server_extension(nbapp):
-
-    web_app = nbapp.web_app
-    env_name = 'production'
-    config = config_for_env(env_name)
-    define('config', config)
-
-    host_pattern = '.*'
-    route_pattern = url_path_join(web_app.settings['base_url'], '/interact')
-    web_app.add_handlers(host_pattern, [(route_pattern, LandingHandler),(route_pattern + '/', LandingHandler)])
+    setup_handlers(nbapp.web_app)
