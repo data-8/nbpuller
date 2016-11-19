@@ -61,7 +61,7 @@ class ProductionConfig(Config):
     PORT = 8002
 
     # URL for users to access. Make sure it has a trailing slash.
-    URL = r'/hub/interact/'
+    URL = r'/interact/'
 
     # Cookie name?
     COOKIE = 'jupyter-hub-token'
