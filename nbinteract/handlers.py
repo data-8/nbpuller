@@ -107,8 +107,6 @@ class LandingHandler(RequestHandler):
             'username': username,
         })
 
-        import pdb; pdb.set_trace()
-
         self.render("progress.html", socket_args=socket_args, server_extension_url=server_extension_url,)
 
 class RequestHandler(WebSocketHandler):

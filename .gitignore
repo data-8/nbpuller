@@ -2,3 +2,5 @@
 .ipynb_checkpoints
 *.ipynb
 nbinteract/.DS_Store
+app
+home

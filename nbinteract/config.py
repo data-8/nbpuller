@@ -67,13 +67,13 @@ class ProductionConfig(Config):
     COOKIE = 'jupyter-hub-token'
 
     # where file is copied to
-    COPY_PATH = '/home/{username}'
+    COPY_PATH = 'home'
 
     # where users are redirected upon file download success
     FILE_REDIRECT_PATH = '/user/{username}/notebooks/{destination}'
 
     # where users are redirect upon git pull success
-    GIT_REDIRECT_PATH = '/user/{username}/tree/{destination}'
+    GIT_REDIRECT_PATH = '/user/{username}/tree/home/{destination}'
 
     # allowed sources for file parameter in query
     ALLOWED_DOMAIN = 'http://data8.org'
@@ -108,15 +108,13 @@ class DevelopmentConfig(Config):
     COOKIE = 'interact'
 
     # where file is copied to
-    COPY_PATH = 'app/static/users/{username}'
+    COPY_PATH = 'home'
 
     # where users are redirected upon file download success
-    FILE_REDIRECT_PATH = '/static/users/{username}/{destination}'
+    FILE_REDIRECT_PATH = '/user/{username}/notebooks/{destination}'
 
-    # where users are redirected upon git pull success
-    # This doesn't actually do anything in development since Flask can't serve
-    # directories
-    GIT_REDIRECT_PATH = None
+    # where users are redirect upon git pull success
+    GIT_REDIRECT_PATH = '/tree/home/{destination}'
 
     # allowed sources for file parameter in query
     ALLOWED_DOMAIN = 'http://localhost:8000'
