@@ -168,7 +168,7 @@ def setup_handlers(web_app):
     web_app.settings.update(settings)
 
     socket_url = web_app.settings['base_url'] + r'socket/(\S+)'
-    host_pattern = '.*$'
+    host_pattern = '.*'
     route_pattern = url_path_join(web_app.settings['base_url'], '/interact')
     web_app.add_handlers(host_pattern, [
         (route_pattern, LandingHandler),
