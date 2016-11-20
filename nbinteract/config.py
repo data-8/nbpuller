@@ -79,9 +79,7 @@ class ProductionConfig(Config):
     ALLOWED_DOMAIN = 'http://data8.org'
 
     # base_url for the program
-    # TODO: add this back when we integrate with ks8
-    # BASE_URL = 'https://{}'.format(os.environ.get('BASE_URL'))
-    BASE_URL = 'http://localhost:8888'
+    BASE_URL = 'http://{}'.format(os.environ.get('BASE_URL'))
 
     SERVER_NAME = BASE_URL
 
