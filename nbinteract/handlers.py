@@ -78,8 +78,6 @@ class LandingHandler(RequestHandler):
         is_redirect = (redirection.startswith('/') or
                        redirection.startswith('http'))
 
-        is_redirect = None
-
         if is_redirect:
             values = []
             for k, v in args.items():
