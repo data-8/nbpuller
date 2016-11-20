@@ -58,9 +58,11 @@ class Config(object):
 class ProductionConfig(Config):
     """Configuration for production"""
 
-    username = os.environ.get('JPY_USER')
+    username = os.environ.get('USER')
 
     PORT = 8002
+    # Temporary b/c we don't have ssl. Remove on real production
+    MOCK_AUTH = True
 
     # URL for users to access. Make sure it has a trailing slash.
     URL = '/user/{username}/'.format(username=username)
@@ -81,7 +83,13 @@ class ProductionConfig(Config):
     ALLOWED_DOMAIN = 'http://data8.org'
 
     # base_url for the program
-    BASE_URL = 'http://{}'.format(os.environ.get('PROXY_PUBLIC_SERVICE_HOST'))
+    # TODO: Pass a 'JPY_HUB_EXTERNAL_IP' env var to single user pods
+    BASE_URL = 'http://{}'.format(os.environ.get('JPY_HUB_EXTERNAL_IP'))
+
+    # Base url for the hub api
+    # JPY_HUB_API_URL is formate like this: http://<ip>:<port>/hub/api
+    # so, ommiting the last 8 chars will produce: http://<ip>:<port>
+    HUB_API_BASE_URL = os.environ.get('JPY_HUB_API_URL')[:-8]
 
     SERVER_NAME = BASE_URL
 

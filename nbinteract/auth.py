@@ -33,7 +33,7 @@ class HubAuth(object):
 
         # base url for the website
         self.hub_base_url = self.config['BASE_URL']
-        self._hubapi_base_url = self.config['BASE_URL']
+        self._hubapi_base_url = self.config['HUB_API_BASE_URL']
 
         # token for JupyterHub API
         self.hubapi_token = self.config['API_TOKEN']
