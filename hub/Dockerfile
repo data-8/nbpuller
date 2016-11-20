@@ -1,23 +1,15 @@
-FROM debian:jessie
+FROM yuvipanda/simple-singleuser:v1
 
 RUN apt-get update
 RUN apt-get install -y --no-install-recommends python3 python3-pip ca-certificates git nginx-extras lua-cjson
 
+RUN pip3 --no-cache-dir install jupyter requests-futures jupyterhub-dummyauthenticator pytest webargs requests gitpython toolz
+
 RUN pip3 install --upgrade pip
-RUN pip3 --no-cache-dir install jupyterhub requests-futures jupyterhub-dummyauthenticator pytest webargs requests gitpython toolz
 
-RUN pip3 --no-cache-dir install git+https://github.com/data-8/kubespawner.git
-RUN pip3 --no-cache-dir install git+https://github.com/yuvipanda/jupyterhub-nginx-chp.git
-RUN pip3 --no-cache-dir install git+https://github.com/data-8/nbinteract.git
-
+RUN pip install git+https://github.com/data-8/nbinteract.git
 RUN jupyter serverextension enable --py nbinteract
 RUN jupyter nbextension install --py nbinteract
 RUN jupyter nbextension enable --py nbinteract
 
-ADD jupyterhub_config.py /srv/jupyterhub_config.py
-
-WORKDIR /srv/jupyterhub
-
-EXPOSE 8000
-
-CMD jupyterhub --config /srv/jupyterhub_config.py --no-ssl
+CMD jupyterhub-singleuser --port=8888 --ip=0.0.0.0 --user=\"$JPY_USER\" --cookie-name=$JPY_COOKIE_NAME --base-url=$JPY_BASE_URL --hub-prefix=$JPY_HUB_PREFIX   --hub-api-url=$JPY_HUB_API_URL"

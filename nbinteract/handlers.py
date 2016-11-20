@@ -151,7 +151,7 @@ class RequestHandler(WebSocketHandler):
             self.write_message(message)
 
 def setup_handlers(web_app):
-    env_name = 'development'
+    env_name = 'production'
     config = config_for_env(env_name)
     define('config', config)
 
