@@ -79,9 +79,7 @@ class ProductionConfig(Config):
     ALLOWED_DOMAIN = 'http://data8.org'
 
     # base_url for the program
-    # TODO: add this back when we integrate with ks8
-    # BASE_URL = 'https://{}'.format(os.environ.get('BASE_URL'))
-    BASE_URL = 'http://localhost:8888'
+    BASE_URL = 'https://{}'.format(os.environ.get('BASE_URL'))
 
     SERVER_NAME = BASE_URL
 
@@ -111,7 +109,7 @@ class DevelopmentConfig(Config):
     COPY_PATH = 'home'
 
     # where users are redirected upon file download success
-    FILE_REDIRECT_PATH = '/user/{username}/notebooks/{destination}'
+    FILE_REDIRECT_PATH = '/notebooks/{destination}'
 
     # where users are redirect upon git pull success
     GIT_REDIRECT_PATH = '/tree/home/{destination}'
