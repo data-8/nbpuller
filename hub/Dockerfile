@@ -5,12 +5,12 @@ RUN apt-get install -y --no-install-recommends python3 python3-pip ca-certificat
 
 RUN pip3 install --upgrade pip
 RUN pip3 --no-cache-dir install jupyterhub requests-futures jupyterhub-dummyauthenticator pytest webargs requests gitpython toolz
-RUN jupyter nbextension install --py helpful_package
 
-RUN pip3 --no-cache-dir install git+https://github.com/data-8/kubespawner.git@volumes
+RUN pip3 --no-cache-dir install git+https://github.com/data-8/kubespawner.git
 RUN pip3 --no-cache-dir install git+https://github.com/yuvipanda/jupyterhub-nginx-chp.git
 RUN pip3 --no-cache-dir install git+https://github.com/data-8/nbinteract.git
 
+RUN jupyter serverextension enable --py nbinteract
 RUN jupyter nbextension install --py nbinteract
 RUN jupyter nbextension enable --py nbinteract
 
