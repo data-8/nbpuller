@@ -170,13 +170,15 @@ def setup_handlers(web_app):
             static_url_prefix=config['URL'] + 'static/',
         )
     web_app.settings.update(settings)
-    web_app.settings['nbextensions_path'].append(os.path.join(os.path.dirname(__file__), 'static/'))
-    web_app.settings['jinja2_env'].loader.searchpath.append(join(dirname(__file__), 'static/'))
 
     socket_url = web_app.settings['base_url'] + r'socket/(\S+)'
     host_pattern = '.*$'
     route_pattern = url_path_join(web_app.settings['base_url'], '/interact')
-    web_app.add_handlers(host_pattern, [(route_pattern, LandingHandler),(route_pattern + '/', LandingHandler),(socket_url, RequestHandler)])
+    web_app.add_handlers(host_pattern, [
+        (route_pattern, LandingHandler),
+        (route_pattern + '/', LandingHandler),
+        (socket_url, RequestHandler)
+    ])
 
 
 
