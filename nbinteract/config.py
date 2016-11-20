@@ -79,7 +79,7 @@ class ProductionConfig(Config):
     ALLOWED_DOMAIN = 'http://data8.org'
 
     # base_url for the program
-    BASE_URL = 'http://{}'.format(os.environ.get('BASE_URL'))
+    BASE_URL = 'http://{}'.format(os.environ.get('PROXY_PUBLIC_SERVICE_HOST'))
 
     SERVER_NAME = BASE_URL
 
