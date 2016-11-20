@@ -73,6 +73,7 @@ class LandingHandler(RequestHandler):
 
         hubauth = HubAuth(options.config)
         # authenticate() returns either a username as a string or a redirect
+
         redirection = username = hubauth.authenticate(self.request)
         util.logger.info("authenticate returned: {}".format(redirection))
         is_redirect = (redirection.startswith('/') or

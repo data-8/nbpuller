@@ -58,13 +58,15 @@ class Config(object):
 class ProductionConfig(Config):
     """Configuration for production"""
 
+    username = os.environ.get('USER')
+
     PORT = 8002
 
     # URL for users to access. Make sure it has a trailing slash.
-    URL = '/user/{username}/'
+    URL = '/user/{username}/'.format(username=username)
 
     # Cookie name?
-    COOKIE = 'jupyter-hub-token'
+    COOKIE = 'jupyter-hub-token-{username}'.format(username=username)
 
     # where file is copied to
     COPY_PATH = 'home'
