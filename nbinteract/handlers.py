@@ -22,7 +22,6 @@ from webargs.tornadoparser import use_args
 
 from . import messages
 from . import util
-from .auth import HubAuth
 from .download_file_and_redirect import download_file_and_redirect
 from .git_progress import Progress
 from .pull_from_github import pull_from_github
@@ -38,7 +37,7 @@ url_args = {
 
 class LandingHandler(RequestHandler):
     """
-    Landing page containing option to download OR (exclusive) authenticate.
+    Landing page containing option to download.
 
     Option 1
     --------
@@ -47,7 +46,7 @@ class LandingHandler(RequestHandler):
 
     Example: ?file=http://localhost:8000/README.md
 
-    Authenticates, then downloads file into user's system.
+    Downloads file into user's system.
 
     Option 2
     --------
@@ -56,7 +55,7 @@ class LandingHandler(RequestHandler):
 
     Example: ?repo=textbook&path=notebooks&path=chapter1%2Fintroduction.md
 
-    Authenticates, then pulls content into user's file system.
+    Pulls content into user's file system.
     Note: Only the gh-pages branch is pulled from Github.
     """
     @use_args(url_args)
@@ -71,31 +70,6 @@ class LandingHandler(RequestHandler):
         if not valid_request:
             self.render('404.html', server_extension_url=server_extension_url,)
 
-        hubauth = HubAuth(options.config)
-        # authenticate() returns either a username as a string or a redirect
-
-        redirection = username = hubauth.authenticate(self.request)
-        util.logger.info("authenticate returned: {}".format(redirection))
-        is_redirect = (redirection.startswith('/') or
-                       redirection.startswith('http'))
-
-        if is_redirect:
-            values = []
-            for k, v in args.items():
-                if not isinstance(v, str):
-                    v = '&path='.join(v)
-                values.append('%s=%s' % (k, v))
-            util.logger.info("rendering landing page")
-            download_links = (util.generate_git_download_link(args)
-                              if is_git_request
-                              else [args['file']])
-            return self.render(
-                'landing.html',
-                server_extension_url=server_extension_url,
-                authenticate_link=redirection,
-                download_links=download_links,
-                query='&'.join(values))
-
         util.logger.info("rendering progress page")
 
         # These config options are passed into the `openStatusSocket`
@@ -103,10 +77,14 @@ class LandingHandler(RequestHandler):
         socket_args = json.dumps({
             'is_development': options.config['DEBUG'],
             'base_url': options.config['URL'],
-            'username': username,
+            'username': options.config['USERNAME'],
         })
 
-        self.render("progress.html", socket_args=socket_args, server_extension_url=server_extension_url,)
+        self.render(
+            "progress.html",
+            socket_args=socket_args,
+            server_extension_url=server_extension_url,
+        )
 
 class RequestHandler(WebSocketHandler):
     """
@@ -168,7 +146,7 @@ def setup_handlers(web_app):
         )
     web_app.settings.update(settings)
 
-    socket_url = web_app.settings['base_url'] + r'socket/(\S+)'
+    socket_url = url_path_join(config['URL'], r'socket/(\S+)')
     host_pattern = '.*'
     route_pattern = url_path_join(web_app.settings['base_url'], '/interact')
     web_app.add_handlers(host_pattern, [

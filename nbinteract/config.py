@@ -30,9 +30,6 @@ class Config(object):
     # every environment, so os.environ['FOOBAR'] will throw an error in
     # development.
 
-    # JupyterHub API token
-    API_TOKEN = os.environ.get('JPY_API_TOKEN', default='')
-
     # Github API token; used to pull private repos
     GITHUB_API_TOKEN = os.environ.get('GITHUB_API_TOKEN', default='')
 
@@ -58,17 +55,13 @@ class Config(object):
 class ProductionConfig(Config):
     """Configuration for production"""
 
-    username = os.environ.get('USER')
-
     PORT = 8002
-    # Temporary b/c we don't have ssl. Remove on real production
-    MOCK_AUTH = True
 
     # URL for users to access. Make sure it has a trailing slash.
-    URL = '/user/{username}/'.format(username=username)
+    URL = os.environ.get('JPY_BASE_URL')
 
-    # Cookie name?
-    COOKIE = 'jupyter-hub-token-{username}'.format(username=username)
+    # username of user
+    USERNAME = os.environ.get('JPY_USER')
 
     # where file is copied to
     COPY_PATH = 'home'
@@ -78,20 +71,6 @@ class ProductionConfig(Config):
 
     # where users are redirect upon git pull success
     GIT_REDIRECT_PATH = '/user/{username}/tree/home/{destination}'
-
-    # allowed sources for file parameter in query
-    ALLOWED_DOMAIN = 'http://data8.org'
-
-    # base_url for the program
-    # TODO: Pass a 'JPY_HUB_EXTERNAL_IP' env var to single user pods
-    BASE_URL = 'http://{}'.format(os.environ.get('JPY_HUB_EXTERNAL_IP'))
-
-    # Base url for the hub api
-    # JPY_HUB_API_URL is formate like this: http://<ip>:<port>/hub/api
-    # so, ommiting the last 8 chars will produce: http://<ip>:<port>
-    HUB_API_BASE_URL = os.environ.get('JPY_HUB_API_URL')[:-8]
-
-    SERVER_NAME = BASE_URL
 
     # alowed file extensions
     ALLOWED_FILETYPES = ['ipynb']
