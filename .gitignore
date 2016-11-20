@@ -8,3 +8,4 @@ hub/apt_get_packages.txt
 hub/conda_packages.txt
 hub/jupyterhub.sqlite
 hub/jupyterhub_cookie_secret
+pip_packages.txt

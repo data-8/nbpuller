@@ -58,7 +58,7 @@ class Config(object):
 class ProductionConfig(Config):
     """Configuration for production"""
 
-    username = os.environ.get('USER')
+    username = os.environ.get('JPY_USER')
 
     PORT = 8002
 
