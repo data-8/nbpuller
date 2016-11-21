@@ -56,6 +56,8 @@ class ProductionConfig(Config):
     """Configuration for production"""
 
     PORT = 8002
+    MOCK_AUTH = True
+    DEBUG = True
 
     # URL for users to access. Make sure it has a trailing slash.
     URL = os.environ.get('JPY_BASE_URL', default='') + "/"
