@@ -58,7 +58,7 @@ class ProductionConfig(Config):
     PORT = 8002
 
     # URL for users to access. Make sure it has a trailing slash.
-    URL = os.environ.get('JPY_BASE_URL') + "/"
+    URL = os.environ.get('JPY_BASE_URL', default='') + "/"
 
     # username of user
     USERNAME = os.environ.get('JPY_USER')
