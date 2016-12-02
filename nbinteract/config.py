@@ -66,13 +66,13 @@ class ProductionConfig(Config):
     USERNAME = os.environ.get('JPY_USER')
 
     # where file is copied to
-    COPY_PATH = 'home'
+    COPY_PATH = ''
 
     # where users are redirected upon file download success
     FILE_REDIRECT_PATH = '/user/{username}/notebooks/{destination}'
 
     # where users are redirect upon git pull success
-    GIT_REDIRECT_PATH = '/user/{username}/tree/home/{destination}'
+    GIT_REDIRECT_PATH = '/user/{username}/tree/{destination}'
 
     # alowed file extensions
     ALLOWED_FILETYPES = ['ipynb']
