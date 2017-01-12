@@ -63,7 +63,13 @@ class ProductionConfig(Config):
     URL = os.environ.get('JPY_BASE_URL', default='') + "/"
 
     # username of user
-    USERNAME = os.environ.get('JPY_USER')
+    USERNAME = os.environ.get('JPY_USER', default='jovyan')
+
+    # url of hub
+    # ex: 'http://10.3.242.214:8081/hub/api' will be cut to '10.3.242.214'
+    HUB_URL = os.environ.get('JPY_HUB_API_URL', default='')
+    if HUB_URL:
+        HUB_URL = HUB_URL.split('/')[2].split(':')[0]
 
     # where file is copied to
     COPY_PATH = ''

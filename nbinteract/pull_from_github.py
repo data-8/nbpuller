@@ -62,6 +62,7 @@ def pull_from_github(**kwargs):
                 progress=progress,
             )
 
+        _set_git_config_variables(config)
         _add_sparse_checkout_paths(repo_dir, paths)
 
         repo = git.Repo(repo_dir)
@@ -122,6 +123,19 @@ DELETED_FILE_REGEX = re.compile(
     r"deleted:\s+"  # Look for deleted: + any amount of whitespace...
     r"(\S+)"        # and match the filename afterward.
 )
+
+
+def _set_git_config_variables(config):
+    """
+    Sets the user.email and user.name global config variables
+    for git so that it does not error out when trying to make
+    a commit when the repo is dirty.
+    """
+    git_config_file = open("~/.gitconfig", "w")
+    git_config_file.write("[user]\n")
+    git_config_file.write("\tname = {0}\n".format(config['USERNAME']))
+    git_config_file.write("\temail = {0}@{1}".format(config['USERNAME'], config['HUB_URL']))
+    git_config_file.close()
 
 
 def _reset_deleted_files(repo):
