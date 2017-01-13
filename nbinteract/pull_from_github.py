@@ -134,7 +134,7 @@ def _set_git_config_variables(config):
     git_config_file = open("~/.gitconfig", "w")
     git_config_file.write("[user]\n")
     git_config_file.write("\tname = {0}\n".format(config['USERNAME']))
-    git_config_file.write("\temail = {0}@{1}".format(config['USERNAME'], config['HUB_URL']))
+    git_config_file.write("\temail = {0}@{1}".format(config['EMAIL']))
     git_config_file.close()
 
 
