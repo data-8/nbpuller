@@ -131,7 +131,7 @@ def _set_git_config_variables(config):
     for git so that it does not error out when trying to make
     a commit when the repo is dirty.
     """
-    git_config_file = open("~/.gitconfig", "w")
+    git_config_file = open("~/.gitconfig", "w+")
     git_config_file.write("[user]\n")
     git_config_file.write("\tname = {0}\n".format(config['USERNAME']))
     git_config_file.write("\temail = {0}@{1}".format(config['EMAIL']))
