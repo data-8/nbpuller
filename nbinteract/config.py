@@ -65,6 +65,9 @@ class ProductionConfig(Config):
     # username of user
     USERNAME = os.environ.get('JPY_USER', default='jovyan')
 
+    # git email
+    EMAIL = os.environ.get('EMAIL', default='jovyan@default')
+
     # where file is copied to
     COPY_PATH = ''
 
