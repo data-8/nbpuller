@@ -84,7 +84,7 @@ def pull_from_github(**kwargs):
 
     except git.exc.GitCommandError as git_err:
         util.logger.error(git_err)
-        return messages.error(git_err.stderr.decode('UTF-8'))
+        return messages.error(git_err.stderr)
 
     finally:
         # Always set ownership to username in case of a git failure
