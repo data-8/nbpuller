@@ -74,7 +74,7 @@ def pull_from_github(**kwargs):
             return messages.status('Pulled from repo: ' + repo_name)
 
         # Redirect to the final path given in the URL
-        destination = os.path.join(repo_name, paths[-1])
+        destination = os.path.join(repo_name, paths[-1].replace('*',''))
         redirect_url = util.construct_path(config['GIT_REDIRECT_PATH'], {
             'username': username,
             'destination': destination,
