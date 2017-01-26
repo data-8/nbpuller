@@ -66,7 +66,10 @@ def pull_from_github(**kwargs):
 
         full_path = '/'.join(paths)
         if not _git_file_exists(repo, full_path):
-            return messages.error("File or directory " + full_path + " is not found in remote repository.");
+            return messages.error({
+                'message': "File or directory " + full_path + " is not found in remote repository.",
+                'proceed_url': config['ERROR_REDIRECT_URL']
+            });
 
         _add_sparse_checkout_paths(repo_dir, paths)
 
@@ -89,7 +92,10 @@ def pull_from_github(**kwargs):
 
     except git.exc.GitCommandError as git_err:
         util.logger.error(git_err)
-        return messages.error(git_err.stderr)
+        return messages.error({
+                'message': git_err.stderr,
+                'proceed_url': config['ERROR_REDIRECT_URL']
+            })
 
     finally:
         # Always set ownership to username in case of a git failure
