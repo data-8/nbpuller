@@ -62,9 +62,14 @@ def pull_from_github(**kwargs):
                 progress=progress,
             )
 
+        repo = git.Repo(repo_dir)
+
+        full_path = '/'.join(paths)
+        if not _git_file_exists(repo, full_path):
+            return messages.error("File or directory " + full_path + " is not found in remote repository.");
+
         _add_sparse_checkout_paths(repo_dir, paths)
 
-        repo = git.Repo(repo_dir)
         _reset_deleted_files(repo)
         _make_commit_if_dirty(repo)
 
@@ -148,6 +153,18 @@ def _clean_path(path):
     """
     return path.replace(' ', '\ ')
 
+
+def _git_file_exists(repo, filename):
+    """
+    Checks to see if the file or directory actually exists in the remote repo
+    using: git cat-file -e origin/gh-pages:<filename>
+    """
+    git_cli = repo.git
+    try:
+        result = git_cli.cat_file('-e', 'origin/gh-pages:' + filename)
+        return True
+    except git.exc.GitCommandError as git_err:
+        return False
 
 def _add_sparse_checkout_paths(repo_dir, paths):
     """
