@@ -1,3 +1,15 @@
+function showProceedLink(proceed_url) {
+  if (proceed_url) {
+    $(".proceed-link").attr('href', proceed_url);
+    $(".proceed-link").html(proceed_url);
+  } else  {
+    var domain = document.domain;
+    $(".proceed-link").attr('href', domain);
+    $(".proceed-link").html("http://" + domain);
+  }
+  $(".proceed-container").show();
+}
+
 function updateStatus(payload) {
   $('.status').html(payload);
 }
@@ -12,7 +24,8 @@ function updateLog(payload) {
 }
 
 function showError(payload) {
-  updateStatus(payload);
+  updateStatus(payload.message);
+  showProceedLink(payload.proceed_url);
 }
 
 // Keep in sync with messages.py

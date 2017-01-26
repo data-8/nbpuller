@@ -44,6 +44,9 @@ class Config(object):
     # notebook exists under user's account
     AUTH_TIMEOUT_S = 10
 
+    # This is the url that will be shown to the user if an error occurs
+    ERROR_REDIRECT_URL = os.environ.get('ERROR_REDIRECT_URL', default='')
+
     def __getitem__(self, attr):
         """
         Temporary hack in order to maintain Flask config-like config usage.
