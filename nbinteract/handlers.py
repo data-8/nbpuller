@@ -33,6 +33,7 @@ url_args = {
 
     'repo': fields.Str(),
     'path': fields.List(fields.Str()),
+    'branch': fields.Str(missing=options.config['REPO_BRANCH']),
 }
 
 class LandingHandler(RequestHandler):
@@ -56,7 +57,6 @@ class LandingHandler(RequestHandler):
     Example: ?repo=textbook&path=notebooks&path=chapter1%2Fintroduction.md
 
     Pulls content into user's file system.
-    Note: Only the gh-pages branch is pulled from Github.
     """
     @use_args(url_args)
     def get(self, args):
@@ -117,6 +117,7 @@ class RequestHandler(WebSocketHandler):
                     username=username,
                     repo_name=args['repo'],
                     paths=args['path'],
+                    branch=args['branch'],
                     config=options.config,
                     progress=Progress(username, self.write_message)
                 )

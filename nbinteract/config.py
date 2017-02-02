@@ -37,7 +37,7 @@ class Config(object):
     # private repos can be pulled
     GITHUB_ORG = 'https://{}@github.com/data-8/'.format(GITHUB_API_TOKEN)
 
-    # The branch that will be pulled in
+    # The default branch that will be pulled in
     REPO_BRANCH = 'gh-pages'
 
     # Timeout for authentication token retrieval. Used when checking if

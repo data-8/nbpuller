@@ -41,6 +41,7 @@ def pull_from_github(**kwargs):
     username = kwargs['username']
     repo_name = kwargs['repo_name']
     paths = kwargs['paths']
+    branch = kwargs['branch']
     config = kwargs['config']
     progress = kwargs['progress']
 
@@ -49,6 +50,7 @@ def pull_from_github(**kwargs):
     util.logger.info('Starting pull.')
     util.logger.info('    User: {}'.format(username))
     util.logger.info('    Repo: {}'.format(repo_name))
+    util.logger.info('    Branch: {}'.format(branch))
     util.logger.info('    Paths: {}'.format(paths))
 
     repo_dir = util.construct_path(config['COPY_PATH'], locals(), repo_name)
@@ -58,6 +60,7 @@ def pull_from_github(**kwargs):
             _initialize_repo(
                 repo_name,
                 repo_dir,
+                branch,
                 config,
                 progress=progress,
             )
@@ -65,9 +68,9 @@ def pull_from_github(**kwargs):
         repo = git.Repo(repo_dir)
 
         full_path = '/'.join(paths)
-        if not _git_file_exists(repo, full_path):
+        if not _git_file_exists(repo, branch, full_path):
             return messages.error({
-                'message': "File or directory " + full_path + " is not found in remote repository.",
+                'message': "Path '" + full_path + "' not found in repository.",
                 'proceed_url': config['ERROR_REDIRECT_URL']
             });
 
@@ -107,7 +110,7 @@ def pull_from_github(**kwargs):
             util.chown_dir(repo_dir, username)
 
 
-def _initialize_repo(repo_name, repo_dir, config, progress=None):
+def _initialize_repo(repo_name, repo_dir, branch, config, progress=None):
     """
     Clones repository and configures it to use sparse checkout.
     Extraneous folders will get removed later using git read-tree
@@ -118,7 +121,7 @@ def _initialize_repo(repo_name, repo_dir, config, progress=None):
         config['GITHUB_ORG'] + repo_name,
         repo_dir,
         progress,
-        branch=config['REPO_BRANCH'],
+        branch,
     )
 
     # Use sparse checkout
@@ -160,14 +163,14 @@ def _clean_path(path):
     return path.replace(' ', '\ ')
 
 
-def _git_file_exists(repo, filename):
+def _git_file_exists(repo, branch, filename):
     """
     Checks to see if the file or directory actually exists in the remote repo
-    using: git cat-file -e origin/gh-pages:<filename>
+    using: git cat-file -e origin/{branch}:{filename}
     """
     git_cli = repo.git
     try:
-        result = git_cli.cat_file('-e', 'origin/gh-pages:' + filename)
+        result = git_cli.cat_file('-e', 'origin/{}:{}'.format(branch, filename))
         return True
     except git.exc.GitCommandError as git_err:
         return False
