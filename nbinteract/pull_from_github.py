@@ -166,6 +166,13 @@ def _git_file_exists(repo, filename):
     using: git cat-file -e origin/gh-pages:<filename>
     """
     git_cli = repo.git
+
+    # fetch origin first so that cat-file can see if the file exists
+    try:
+        git_cli.fetch('origin/gh-pages')
+    except git.exc.GitCommandError as git_err:
+        pass
+
     try:
         result = git_cli.cat_file('-e', 'origin/gh-pages:' + filename)
         return True
