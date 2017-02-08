@@ -169,7 +169,7 @@ def _git_file_exists(repo, filename):
 
     # fetch origin first so that cat-file can see if the file exists
     try:
-        git_cli.fetch('origin/gh-pages')
+        git_cli.fetch()
     except git.exc.GitCommandError as git_err:
         pass
 
