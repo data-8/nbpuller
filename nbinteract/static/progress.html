@@ -21,7 +21,8 @@
         openStatusSocket({% raw socket_args %});
     });
     if (getBrowserName() == "Chrome") {
-        document.getElementById("BrowserCaption").innerHTML = "";
+        // Remove "use Chrome" notification
+        document.getElementById("BrowserCaption").innerHTML = ""; 
     }
 </script>
 {% end %}

@@ -107,6 +107,8 @@ $(document).ready(function() {
   });
 });
 
+// Return the name of the browser in a string
+// ** only tested for Google Chrome 55 yet
 function getBrowserName(){
     var ua= navigator.userAgent, tem,
     M= ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
