@@ -3,7 +3,7 @@
 <main class="progress-content">
     <p><i class="fa fa-refresh fa-spin fa-3x fa-fw"></i></p>
     <h1>Data8 Interact Server</h1>
-    <h2> Please use Google Chrome to avoid any errors! </h2>
+    <h2 id="BrowserCaption"> Please use Google Chrome to avoid any errors! </h2>
     <p class="reversed">Est. time left: <span class="time">30 seconds</span>
         &middot;
     Status:
@@ -20,5 +20,8 @@
     $(document).ready(function() {
         openStatusSocket({% raw socket_args %});
     });
+    if (getBrowserName() == "Chrome") {
+        document.getElementById("BrowserCaption").innerHTML = "";
+    }
 </script>
 {% end %}
