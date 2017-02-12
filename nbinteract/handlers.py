@@ -33,6 +33,7 @@ url_args = {
     'file': fields.Str(),
 
     'repo': fields.Str(),
+    'branch': fields.Str(),
     'path': fields.List(fields.Str()),
 }
 
