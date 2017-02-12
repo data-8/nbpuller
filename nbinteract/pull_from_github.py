@@ -15,9 +15,10 @@ def pull_from_github(**kwargs):
     Redirects the user to the final path provided in the URL. Eg. given a path
     like:
 
-        repo=data8assets&path=labs/lab01&path=labs/lab01/lab01.ipynb
+        repo=data8assets&branch=gh_pages&path=labs/lab01&path=labs/lab01/lab01.ipynb
 
-    The user will be redirected to the lab01.ipynb notebook (and open it).
+    The user will be redirected to the lab01.ipynb notebook in the gh_pages branch
+    (and open it).
 
     This pull preserves the original content in case of a merge conflict by
     making a WIP commit then pulling with -Xours.
@@ -28,29 +29,35 @@ def pull_from_github(**kwargs):
     Reference:
     http://jasonkarns.com/blog/subdirectory-checkouts-with-git-sparse-checkout/
 
-    Kwargs:
+    Required kwargs:
         username (str): The username of the JupyterHub user
         repo_name (str): The repo under the dsten org to pull from, eg.
             textbook or health-connector.
+        branch (str): Name of the branch in the repo.
         paths (list of str): The folders and file names to pull.
         config (Config): The config for this environment.
 
     Returns:
         A message object from messages.py
     """
+
+    # Parse Arguments
     username = kwargs['username']
     repo_name = kwargs['repo_name']
+    branch_name = kwargs['branch']
     paths = kwargs['paths']
     config = kwargs['config']
     progress = kwargs['progress']
 
-    assert username and repo_name and paths and config
+    assert username and repo_name and branch_name and paths and config
 
     util.logger.info('Starting pull.')
     util.logger.info('    User: {}'.format(username))
     util.logger.info('    Repo: {}'.format(repo_name))
+    util.logger.info('    Branch: {}'.format(branch_name))
     util.logger.info('    Paths: {}'.format(paths))
 
+    # Retrieve file form the git repository
     repo_dir = util.construct_path(config['COPY_PATH'], locals(), repo_name)
 
     try:
@@ -58,6 +65,7 @@ def pull_from_github(**kwargs):
             _initialize_repo(
                 repo_name,
                 repo_dir,
+                branch_name,
                 config,
                 progress=progress,
             )
@@ -107,7 +115,7 @@ def pull_from_github(**kwargs):
             util.chown_dir(repo_dir, username)
 
 
-def _initialize_repo(repo_name, repo_dir, config, progress=None):
+def _initialize_repo(repo_name, repo_dir, branch_name, config, progress=None):
     """
     Clones repository and configures it to use sparse checkout.
     Extraneous folders will get removed later using git read-tree
@@ -118,7 +126,7 @@ def _initialize_repo(repo_name, repo_dir, config, progress=None):
         config['GITHUB_ORG'] + repo_name,
         repo_dir,
         progress,
-        branch=config['REPO_BRANCH'],
+        branch=branch_name,
     )
 
     # Use sparse checkout
