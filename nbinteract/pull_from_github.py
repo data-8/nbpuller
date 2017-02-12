@@ -33,7 +33,7 @@ def pull_from_github(**kwargs):
         username (str): The username of the JupyterHub user
         repo_name (str): The repo under the dsten org to pull from, eg.
             textbook or health-connector.
-        branch (str): Name of the branch in the repo.
+        branch_name (str): Name of the branch in the repo.
         paths (list of str): The folders and file names to pull.
         config (Config): The config for this environment.
 
