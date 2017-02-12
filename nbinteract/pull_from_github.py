@@ -84,7 +84,7 @@ def pull_from_github(**kwargs):
         _reset_deleted_files(repo)
         _make_commit_if_dirty(repo)
 
-        _pull_and_resolve_conflicts(repo, config, progress=progress)
+        _pull_and_resolve_conflicts(repo, branch_name, progress=progress)
 
         if not config['GIT_REDIRECT_PATH']:
             return messages.status('Pulled from repo: ' + repo_name)
@@ -233,7 +233,7 @@ def _make_commit_if_dirty(repo):
         util.logger.info('Made WIP commit')
 
 
-def _pull_and_resolve_conflicts(repo, config, progress=None):
+def _pull_and_resolve_conflicts(repo, branch, progress=None):
     """
     Git pulls, resolving conflicts with -Xours
     """
@@ -243,7 +243,7 @@ def _pull_and_resolve_conflicts(repo, config, progress=None):
 
     # Fetch then merge, resolving conflicts by keeping original content
     repo.remote(name='origin').fetch(progress=progress)
-    git_cli.merge('-Xours', 'origin/' + config['REPO_BRANCH'])
+    git_cli.merge('-Xours', 'origin/' + branch)
 
     # Ensure only files/folders in sparse-checkout are left
     git_cli.read_tree('-mu', 'HEAD')
