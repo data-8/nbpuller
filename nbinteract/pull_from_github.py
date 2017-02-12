@@ -15,9 +15,10 @@ def pull_from_github(**kwargs):
     Redirects the user to the final path provided in the URL. Eg. given a path
     like:
 
-        repo=data8assets&path=labs/lab01&path=labs/lab01/lab01.ipynb
+        repo=data8assets&branch=gh_pages&path=labs/lab01&path=labs/lab01/lab01.ipynb
 
-    The user will be redirected to the lab01.ipynb notebook (and open it).
+    The user will be redirected to the lab01.ipynb notebook in the gh_pages branch
+    (and open it).
 
     This pull preserves the original content in case of a merge conflict by
     making a WIP commit then pulling with -Xours.
@@ -28,29 +29,35 @@ def pull_from_github(**kwargs):
     Reference:
     http://jasonkarns.com/blog/subdirectory-checkouts-with-git-sparse-checkout/
 
-    Kwargs:
+    Required kwargs:
         username (str): The username of the JupyterHub user
         repo_name (str): The repo under the dsten org to pull from, eg.
             textbook or health-connector.
+        branch_name (str): Name of the branch in the repo.
         paths (list of str): The folders and file names to pull.
         config (Config): The config for this environment.
 
     Returns:
         A message object from messages.py
     """
+
+    # Parse Arguments
     username = kwargs['username']
     repo_name = kwargs['repo_name']
+    branch_name = kwargs['branch_name']
     paths = kwargs['paths']
     config = kwargs['config']
     progress = kwargs['progress']
 
-    assert username and repo_name and paths and config
+    assert username and repo_name and branch_name and paths and config
 
     util.logger.info('Starting pull.')
     util.logger.info('    User: {}'.format(username))
     util.logger.info('    Repo: {}'.format(repo_name))
+    util.logger.info('    Branch: {}'.format(branch_name))
     util.logger.info('    Paths: {}'.format(paths))
 
+    # Retrieve file form the git repository
     repo_dir = util.construct_path(config['COPY_PATH'], locals(), repo_name)
 
     try:
@@ -58,6 +65,7 @@ def pull_from_github(**kwargs):
             _initialize_repo(
                 repo_name,
                 repo_dir,
+                branch_name,
                 config,
                 progress=progress,
             )
@@ -65,7 +73,7 @@ def pull_from_github(**kwargs):
         repo = git.Repo(repo_dir)
 
         full_path = '/'.join(paths)
-        if not _git_file_exists(repo, full_path):
+        if not _git_file_exists(repo, branch_name, full_path):
             return messages.error({
                 'message': "File or directory " + full_path + " is not found in remote repository.",
                 'proceed_url': config['ERROR_REDIRECT_URL']
@@ -76,7 +84,7 @@ def pull_from_github(**kwargs):
         _reset_deleted_files(repo)
         _make_commit_if_dirty(repo)
 
-        _pull_and_resolve_conflicts(repo, config, progress=progress)
+        _pull_and_resolve_conflicts(repo, branch_name, progress=progress)
 
         if not config['GIT_REDIRECT_PATH']:
             return messages.status('Pulled from repo: ' + repo_name)
@@ -107,7 +115,7 @@ def pull_from_github(**kwargs):
             util.chown_dir(repo_dir, username)
 
 
-def _initialize_repo(repo_name, repo_dir, config, progress=None):
+def _initialize_repo(repo_name, repo_dir, branch_name, config, progress=None):
     """
     Clones repository and configures it to use sparse checkout.
     Extraneous folders will get removed later using git read-tree
@@ -118,7 +126,7 @@ def _initialize_repo(repo_name, repo_dir, config, progress=None):
         config['GITHUB_ORG'] + repo_name,
         repo_dir,
         progress,
-        branch=config['REPO_BRANCH'],
+        branch=branch_name,
     )
 
     # Use sparse checkout
@@ -160,10 +168,10 @@ def _clean_path(path):
     return path.replace(' ', '\ ')
 
 
-def _git_file_exists(repo, filename):
+def _git_file_exists(repo, branch_name, filename):
     """
     Checks to see if the file or directory actually exists in the remote repo
-    using: git cat-file -e origin/gh-pages:<filename>
+    using: git cat-file -e origin/<branch_name>:<filename>
     """
     git_cli = repo.git
 
@@ -174,7 +182,7 @@ def _git_file_exists(repo, filename):
         pass
 
     try:
-        result = git_cli.cat_file('-e', 'origin/gh-pages:' + filename)
+        result = git_cli.cat_file('-e', 'origin/' + branch_name + ':' + filename)
         return True
     except git.exc.GitCommandError as git_err:
         return False
@@ -225,7 +233,7 @@ def _make_commit_if_dirty(repo):
         util.logger.info('Made WIP commit')
 
 
-def _pull_and_resolve_conflicts(repo, config, progress=None):
+def _pull_and_resolve_conflicts(repo, branch, progress=None):
     """
     Git pulls, resolving conflicts with -Xours
     """
@@ -235,7 +243,7 @@ def _pull_and_resolve_conflicts(repo, config, progress=None):
 
     # Fetch then merge, resolving conflicts by keeping original content
     repo.remote(name='origin').fetch(progress=progress)
-    git_cli.merge('-Xours', 'origin/' + config['REPO_BRANCH'])
+    git_cli.merge('-Xours', 'origin/' + branch)
 
     # Ensure only files/folders in sparse-checkout are left
     git_cli.read_tree('-mu', 'HEAD')

@@ -38,7 +38,7 @@ class Config(object):
     GITHUB_ORG = 'https://{}@github.com/data-8/'.format(GITHUB_API_TOKEN)
 
     # The branch that will be pulled in
-    REPO_BRANCH = 'gh-pages'
+    DEFAULT_REPO_BRANCH = 'gh-pages'
 
     # Timeout for authentication token retrieval. Used when checking if
     # notebook exists under user's account

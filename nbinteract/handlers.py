@@ -25,6 +25,7 @@ from . import util
 from .download_file_and_redirect import download_file_and_redirect
 from .git_progress import Progress
 from .pull_from_github import pull_from_github
+from .config import Config
 
 thread_pool = ThreadPoolExecutor(max_workers=4)
 
@@ -32,6 +33,7 @@ url_args = {
     'file': fields.Str(),
 
     'repo': fields.Str(),
+    'branch': fields.Str(),
     'path': fields.List(fields.Str()),
 }
 
@@ -51,17 +53,16 @@ class LandingHandler(RequestHandler):
     Option 2
     --------
 
-        ?repo=data8_github_repo_name&path=file_or_folder_name&path=other_folder
+        ?repo=data8_github_repo_name&branch=branch_name_OR_DEFAULT_NAME&path=file_or_folder_name&path=other_folder
 
-    Example: ?repo=textbook&path=notebooks&path=chapter1%2Fintroduction.md
+    Example: ?repo=textbook&path=notebooks&path=chapter1%2Fintroduction.md, when using default branch name
 
     Pulls content into user's file system.
-    Note: Only the gh-pages branch is pulled from Github.
     """
     @use_args(url_args)
     def get(self, args):
         is_file_request = ('file' in args)
-        is_git_request = ('repo' in args and 'path' in args)
+        is_git_request = ('repo' in args and 'path' in args) # branch name can be omitted for default value
         valid_request = xor(is_file_request, is_git_request)
 
         def server_extension_url(url):
@@ -100,7 +101,7 @@ class RequestHandler(WebSocketHandler):
         util.logger.info('({}) Websocket connected'.format(username))
 
         # We don't do validation since we assume that the LandingHandler did
-        # it, so this isn't very secure.
+        # it. TODO: ENHANCE SECURITY
         is_file_request = ('file' in args)
 
         try:
@@ -112,10 +113,13 @@ class RequestHandler(WebSocketHandler):
                     config=options.config,
                 )
             else:
+                if 'branch' not in args:
+                    args['branch'] = Config.DEFAULT_BRANCH_NAME
                 message = yield thread_pool.submit(
                     pull_from_github,
                     username=username,
                     repo_name=args['repo'],
+                    branch_name=args['branch'],
                     paths=args['path'],
                     config=options.config,
                     progress=Progress(username, self.write_message)

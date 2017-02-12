@@ -42,7 +42,9 @@ def construct_path(path, format, *args):
 
 
 def generate_git_download_link(args):
-    """Generates a download link for files hosted on Git.
+    """ DEPRECATED! SHOULD NOT BE USED DUE TO WRONG
+    BRANCH NAME.
+    Generates a download link for files hosted on Git.
 
     :param args: dictionary of query string "arguments"
     :return: URIs for the specified git resources
