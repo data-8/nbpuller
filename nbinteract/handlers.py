@@ -58,7 +58,6 @@ class LandingHandler(RequestHandler):
     Example: ?repo=textbook&path=notebooks&path=chapter1%2Fintroduction.md, when using default branch name
 
     Pulls content into user's file system.
-    Note: Only the gh-pages branch is pulled from Github.
     """
     @use_args(url_args)
     def get(self, args):

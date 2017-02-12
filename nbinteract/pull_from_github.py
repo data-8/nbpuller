@@ -44,7 +44,7 @@ def pull_from_github(**kwargs):
     # Parse Arguments
     username = kwargs['username']
     repo_name = kwargs['repo_name']
-    branch_name = kwargs['branch']
+    branch_name = kwargs['branch_name']
     paths = kwargs['paths']
     config = kwargs['config']
     progress = kwargs['progress']
@@ -73,7 +73,7 @@ def pull_from_github(**kwargs):
         repo = git.Repo(repo_dir)
 
         full_path = '/'.join(paths)
-        if not _git_file_exists(repo, full_path):
+        if not _git_file_exists(repo, branch_name, full_path):
             return messages.error({
                 'message': "File or directory " + full_path + " is not found in remote repository.",
                 'proceed_url': config['ERROR_REDIRECT_URL']
@@ -168,10 +168,10 @@ def _clean_path(path):
     return path.replace(' ', '\ ')
 
 
-def _git_file_exists(repo, filename):
+def _git_file_exists(repo, branch_name, filename):
     """
     Checks to see if the file or directory actually exists in the remote repo
-    using: git cat-file -e origin/gh-pages:<filename>
+    using: git cat-file -e origin/<branch_name>:<filename>
     """
     git_cli = repo.git
 
@@ -182,7 +182,7 @@ def _git_file_exists(repo, filename):
         pass
 
     try:
-        result = git_cli.cat_file('-e', 'origin/gh-pages:' + filename)
+        result = git_cli.cat_file('-e', 'origin/' + branch_name + ':' + filename)
         return True
     except git.exc.GitCommandError as git_err:
         return False
