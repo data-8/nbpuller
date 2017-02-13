@@ -8,7 +8,7 @@ setuptools.setup(
     description="Simple Jupyter extension to use interact.",
     packages=setuptools.find_packages(),
     install_requires=[
-        'notebook',
+        'notebook', 'pytest', 'webargs', 'requests', 'gitpython', 'toolz'
     ],
     package_data={'nbinteract': ['static/*']},
 )
