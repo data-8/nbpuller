@@ -99,7 +99,7 @@ def pull_from_github(**kwargs):
         return messages.redirect(redirect_url)
 
     except git.exc.GitCommandError as git_err:
-        util.logger.error(git_err)
+        util.logger.exception()
         return messages.error({
                 'message': git_err.stderr,
                 'proceed_url': config['ERROR_REDIRECT_URL']
@@ -179,12 +179,13 @@ def _git_file_exists(repo, branch_name, filename):
     try:
         git_cli.fetch()
     except git.exc.GitCommandError as git_err:
-        pass
+        util.logger.exception()
 
     try:
         result = git_cli.cat_file('-e', 'origin/' + branch_name + ':' + filename)
         return True
     except git.exc.GitCommandError as git_err:
+        util.logger.exception()
         return False
 
 def _add_sparse_checkout_paths(repo_dir, paths):
@@ -206,7 +207,7 @@ def _add_sparse_checkout_paths(repo_dir, paths):
             existing_paths = [line.strip().strip('/')
                               for line in info_file.readlines()]
     except FileNotFoundError:
-        pass
+        util.logger.exception()
 
     util.logger.info(
         'Existing paths in sparse-checkout: {}'.format(existing_paths))
