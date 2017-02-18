@@ -15,8 +15,7 @@ GIT_DOWNLOAD_LINK_FORMAT = 'https://minhaskamal.github.io/DownGit/#/home?url' \
 
 # Log all messages by default
 logging.basicConfig(
-    format='[%(asctime)s]: %(levelname)s -- %(message)s',
-    datefmt='%m/%d/%Y %I:%M:%S %p',
+    format='[%(asctime)s] %(levelname)s -- %(message)s',
     level=logging.DEBUG)
 logger = logging.getLogger('app')
 

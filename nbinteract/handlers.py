@@ -130,7 +130,7 @@ class RequestHandler(WebSocketHandler):
         except Exception as e:
             # If something bad happens, the client should see it
             message = messages.error(str(e))
-            util.logger.error('Sent message: {}'.format(message))
+            util.logger.exception('Sent message: {}'.format(message))
             self.write_message(message)
 
 def setup_handlers(web_app):
