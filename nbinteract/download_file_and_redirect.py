@@ -41,12 +41,14 @@ def download_file_and_redirect(**kwargs):
     except HTTPError:
         error = ('Source file "{}" does not exist or is not accessible.'
                  .format(file_url))
+        util.logger.exception(error)
         return messages.error({
                 'message': error,
                 'proceed_url': config['ERROR_REDIRECT_URL']
             })
     except Exception as e:
         error = ('Unhandled error: {}'.format(e))
+        util.logger.exception(error)
         return messages.error({
                 'message': error,
                 'proceed_url': config['ERROR_REDIRECT_URL']
