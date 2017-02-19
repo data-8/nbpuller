@@ -107,4 +107,4 @@ ENV/
 .swp
 
 # Jetbrains stuff
-.idea
+.idea/*
