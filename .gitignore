@@ -105,3 +105,6 @@ ENV/
 
 # Crash file
 .swp
+
+# Jetbrains stuff
+.idea
