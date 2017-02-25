@@ -39,6 +39,7 @@ class Config(object):
 
     # The branch that will be pulled in
     DEFAULT_REPO_BRANCH = 'gh-pages'
+    DEFAULT_BRANCH_NAME = 'gh-pages'
 
     # Timeout for authentication token retrieval. Used when checking if
     # notebook exists under user's account

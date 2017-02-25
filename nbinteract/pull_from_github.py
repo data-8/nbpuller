@@ -72,12 +72,12 @@ def pull_from_github(**kwargs):
 
         repo = git.Repo(repo_dir)
 
-        full_path = '/'.join(paths)
-        if not _git_file_exists(repo, branch_name, full_path):
-            return messages.error({
-                'message': "File or directory " + full_path + " is not found in remote repository.",
-                'proceed_url': config['ERROR_REDIRECT_URL']
-            });
+        for path in paths:
+            if not _git_file_exists(repo, branch_name, path):
+                return messages.error({
+                    'message': "File or directory " + path + " is not found in remote repository.",
+                    'proceed_url': config['ERROR_REDIRECT_URL']
+                });
 
         _add_sparse_checkout_paths(repo_dir, paths)
 
@@ -198,16 +198,18 @@ def _add_sparse_checkout_paths(repo_dir, paths):
 
     Always makes sure .gitignore is checked out
     """
-    sparsecheckout_path = os.path.join(repo_dir,
+    sparse_checkout_path = os.path.join(repo_dir,
                                        '.git', 'info', 'sparse-checkout')
 
     existing_paths = []
     try:
-        with open(sparsecheckout_path) as info_file:
+        sparse_checkout_file = open(sparse_checkout_path, 'r')
+        with sparse_checkout_file as info_file:
             existing_paths = [line.strip().strip('/')
                               for line in info_file.readlines()]
     except FileNotFoundError:
-        util.logger.exception()
+        # If .git/info/sparse-checkout does not exist, create the file
+        open(sparse_checkout_path, 'w')
 
     util.logger.info(
         'Existing paths in sparse-checkout: {}'.format(existing_paths))
@@ -215,7 +217,7 @@ def _add_sparse_checkout_paths(repo_dir, paths):
     paths_with_gitignore = ['.gitignore'] + paths
     to_write = [path for path in paths_with_gitignore
                 if path not in existing_paths]
-    with open(sparsecheckout_path, 'a') as info_file:
+    with open(sparse_checkout_path, 'a') as info_file:
         for path in to_write:
             info_file.write('/{}\n'.format(_clean_path(path)))
 
