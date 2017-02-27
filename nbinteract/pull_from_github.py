@@ -81,7 +81,7 @@ def pull_from_github(**kwargs):
 
         _add_sparse_checkout_paths(repo_dir, paths)
 
-        _reset_deleted_files(repo)
+        _reset_deleted_files(repo, branch_name)
         _make_commit_if_dirty(repo)
 
         _pull_and_resolve_conflicts(repo, branch_name, progress=progress)
@@ -143,7 +143,7 @@ DELETED_FILE_REGEX = re.compile(
 )
 
 
-def _reset_deleted_files(repo):
+def _reset_deleted_files(repo, branch_name):
     """
     Runs the equivalent of git checkout -- <file> for each file that was
     deleted. This allows us to delete a file, hit an interact link, then get a
@@ -155,7 +155,7 @@ def _reset_deleted_files(repo):
     if deleted_files:
         cleaned_filenames = [_clean_path(filename)
                              for filename in deleted_files]
-        git_cli.checkout('--', *cleaned_filenames)
+        git_cli.checkout(branch_name, *cleaned_filenames)
         util.logger.info('Resetted these files: {}'.format(deleted_files))
 
 
