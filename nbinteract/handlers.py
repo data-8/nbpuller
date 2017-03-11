@@ -31,10 +31,10 @@ thread_pool = ThreadPoolExecutor(max_workers=4)
 
 url_args = {
     'file': fields.Str(),
-
     'repo': fields.Str(),
     'branch': fields.Str(),
     'path': fields.List(fields.Str()),
+    'notebook_path': fields.Str(),
 }
 
 class LandingHandler(RequestHandler):
@@ -122,6 +122,7 @@ class RequestHandler(WebSocketHandler):
                     branch_name=args['branch'],
                     paths=args['path'],
                     config=options.config,
+                    notebook_path=args['notebook_path'],
                     progress=Progress(username, self.write_message)
                 )
 

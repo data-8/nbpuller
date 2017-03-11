@@ -48,8 +48,12 @@ def pull_from_github(**kwargs):
     paths = kwargs['paths']
     config = kwargs['config']
     progress = kwargs['progress']
+    notebook_path = kwargs['notebook_path']
 
     assert username and repo_name and branch_name and paths and config
+
+    if not notebook_path:
+        notebook_path = config['COPYT_PATH']
 
     util.logger.info('Starting pull.')
     util.logger.info('    User: {}'.format(username))
@@ -58,7 +62,7 @@ def pull_from_github(**kwargs):
     util.logger.info('    Paths: {}'.format(paths))
 
     # Retrieve file form the git repository
-    repo_dir = util.construct_path(config['COPY_PATH'], locals(), repo_name)
+    repo_dir = util.construct_path(notebook_path, locals(), repo_name)
 
     try:
         if not os.path.exists(repo_dir):
@@ -90,7 +94,7 @@ def pull_from_github(**kwargs):
             return messages.status('Pulled from repo: ' + repo_name)
 
         # Redirect to the final path given in the URL
-        destination = os.path.join(repo_name, paths[-1].replace('*',''))
+        destination = os.path.join(repo_dir, paths[-1].replace('*',''))
         redirect_url = util.construct_path(config['GIT_REDIRECT_PATH'], {
             'username': username,
             'destination': destination,
