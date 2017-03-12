@@ -53,7 +53,7 @@ def pull_from_github(**kwargs):
     assert username and repo_name and branch_name and paths and config
 
     if not notebook_path:
-        notebook_path = config['COPYT_PATH']
+        notebook_path = config['COPY_PATH']
 
     util.logger.info('Starting pull.')
     util.logger.info('    User: {}'.format(username))

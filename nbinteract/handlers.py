@@ -115,6 +115,9 @@ class RequestHandler(WebSocketHandler):
             else:
                 if 'branch' not in args:
                     args['branch'] = Config.DEFAULT_BRANCH_NAME
+                if 'notebook_path' not in args:
+                    args['notebook_path'] = ''
+
                 message = yield thread_pool.submit(
                     pull_from_github,
                     username=username,
