@@ -129,7 +129,10 @@ class RequestHandler(WebSocketHandler):
                     progress=Progress(username, self.write_message)
                 )
 
-            util.logger.info('Sent message: {}'.format(message))
+            if message['type'] == "ERROR":
+                util.logger.exception('Sent message: {}'.format(message))
+            else:
+                util.logger.info('Sent message: {}'.format(message))
             self.write_message(message)
         except Exception as e:
             # If something bad happens, the client should see it

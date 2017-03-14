@@ -77,11 +77,7 @@ def pull_from_github(**kwargs):
         repo = git.Repo(repo_dir)
 
         for path in paths:
-            if not _git_file_exists(repo, branch_name, path):
-                return messages.error({
-                    'message': "File or directory " + path + " is not found in remote repository.",
-                    'proceed_url': config['ERROR_REDIRECT_URL']
-                });
+            _raise_error_if_git_file_not_exists(repo, branch_name, path)
 
         _add_sparse_checkout_paths(repo_dir, paths)
 
@@ -103,7 +99,6 @@ def pull_from_github(**kwargs):
         return messages.redirect(redirect_url)
 
     except git.exc.GitCommandError as git_err:
-        util.logger.exception()
         return messages.error({
                 'message': git_err.stderr,
                 'proceed_url': config['ERROR_REDIRECT_URL']
@@ -172,7 +167,7 @@ def _clean_path(path):
     return path.replace(' ', '\ ')
 
 
-def _git_file_exists(repo, branch_name, filename):
+def _raise_error_if_git_file_not_exists(repo, branch_name, filename):
     """
     Checks to see if the file or directory actually exists in the remote repo
     using: git cat-file -e origin/<branch_name>:<filename>
@@ -183,14 +178,9 @@ def _git_file_exists(repo, branch_name, filename):
     try:
         git_cli.fetch()
     except git.exc.GitCommandError as git_err:
-        util.logger.exception()
+        pass
 
-    try:
-        result = git_cli.cat_file('-e', 'origin/' + branch_name + ':' + filename)
-        return True
-    except git.exc.GitCommandError as git_err:
-        util.logger.exception()
-        return False
+    result = git_cli.cat_file('-e', 'origin/' + branch_name + ':' + filename)
 
 def _add_sparse_checkout_paths(repo_dir, paths):
     """
