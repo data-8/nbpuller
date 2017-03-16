@@ -7,6 +7,17 @@ from . import util
 from . import messages
 
 
+def _generate_repo_url(scheme, domain, account, repo_name, auth_token=''):
+    netloc = None
+    if auth_token:
+        netloc = domain
+    else:
+        netloc = auth_token + '%' + domain
+    if account:
+        account += '/'
+    return "%s://%s/%s%s" % (scheme, netloc, account, repo_name)
+
+
 def pull_from_remote(**kwargs):
     """
     Initializes git repo if needed, then pulls new content from remote repo using
@@ -81,9 +92,8 @@ def pull_from_remote(**kwargs):
 
     # Retrieve file form the git repository
     repo_dir = util.construct_path(notebook_path, locals(), repo_name)
-
+    repo_url = ''
     # Generate repo url
-    repo_url = "https://"
     if domain not in config['ALLOWED_WEB_DOMAINS']:
         return messages.error({
             'message': "Specified domain " + domain + " is not allowed.",
@@ -95,12 +105,11 @@ def pull_from_remote(**kwargs):
                 'message': "Specified github account " + account + " is not allowed.",
                 'proceed_url': config['ERROR_REDIRECT_URL']
             })
-        repo_url += "{}@".format(config['GITHUB_API_TOKEN']) + \
-            domain + "/" + \
-            account + '/' + \
-            repo_name
+        repo_url += _generate_repo_url("https", domain,
+                                       account, repo_name, config['GITHUB_API_TOKEN'])
     else:
-        repo_url += domain + "/" + repo_name
+        repo_url += _generate_repo_url("https",
+                                       domain, '', repo_name)
 
     try:
         if not os.path.exists(repo_dir):
