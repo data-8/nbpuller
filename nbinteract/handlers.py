@@ -24,18 +24,21 @@ from . import messages
 from . import util
 from .download_file_and_redirect import download_file_and_redirect
 from .git_progress import Progress
-from .pull_from_github import pull_from_github
+from nbinteract import pull_from_remote
 from .config import Config
 
 thread_pool = ThreadPoolExecutor(max_workers=4)
 
 url_args = {
     'file': fields.Str(),
+    'domain': fields.Str(),
+    'account': fields.Str(),
     'repo': fields.Str(),
     'branch': fields.Str(),
     'path': fields.List(fields.Str()),
     'notebook_path': fields.Str(),
 }
+
 
 class LandingHandler(RequestHandler):
     """
@@ -62,7 +65,8 @@ class LandingHandler(RequestHandler):
     @use_args(url_args)
     def get(self, args):
         is_file_request = ('file' in args)
-        is_git_request = ('repo' in args and 'path' in args) # branch name can be omitted for default value
+        # branch name can be omitted for default value
+        is_git_request = ('repo' in args and 'path' in args)
         valid_request = xor(is_file_request, is_git_request)
 
         def server_extension_url(url):
@@ -86,6 +90,7 @@ class LandingHandler(RequestHandler):
             socket_args=socket_args,
             server_extension_url=server_extension_url,
         )
+
 
 class RequestHandler(WebSocketHandler):
     """
@@ -117,11 +122,17 @@ class RequestHandler(WebSocketHandler):
                     args['branch'] = Config.DEFAULT_BRANCH_NAME
                 if 'notebook_path' not in args:
                     args['notebook_path'] = ''
+                if 'domain' not in args:
+                    args['domain'] = Config.DEFAULT_DOMAIN
+                if 'account' not in args:
+                    args['account'] = Config.DEFAULT_GITHUB_ACCOUNT
 
                 message = yield thread_pool.submit(
-                    pull_from_github,
+                    pull_from_remote,
                     username=username,
                     repo_name=args['repo'],
+                    domain=args['domain'],
+                    account=args['account'],
                     branch_name=args['branch'],
                     paths=args['path'],
                     config=options.config,
@@ -140,21 +151,22 @@ class RequestHandler(WebSocketHandler):
             util.logger.exception('Sent message: {}'.format(message))
             self.write_message(message)
 
+
 def setup_handlers(web_app):
     env_name = 'production'
     config = config_for_env(env_name)
     define('config', config)
 
     settings = dict(
-            debug=True,
-            serve_traceback=True,
-            compiled_template_cache=False,
-            template_path=os.path.join(os.path.dirname(__file__), 'static/'),
-            static_path=os.path.join(os.path.dirname(__file__), 'static/'),
+        debug=True,
+        serve_traceback=True,
+        compiled_template_cache=False,
+        template_path=os.path.join(os.path.dirname(__file__), 'static/'),
+        static_path=os.path.join(os.path.dirname(__file__), 'static/'),
 
-            # Ensure static urls are prefixed with the base url too
-            static_url_prefix=config['URL'] + 'static/',
-        )
+        # Ensure static urls are prefixed with the base url too
+        static_url_prefix=config['URL'] + 'static/',
+    )
     web_app.settings.update(settings)
 
     socket_url = url_path_join(config['URL'], r'socket/(\S+)')
@@ -165,6 +177,3 @@ def setup_handlers(web_app):
         (route_pattern + '/', LandingHandler),
         (socket_url, RequestHandler)
     ])
-
-
-

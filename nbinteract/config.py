@@ -26,19 +26,30 @@ class Config(object):
 
     PORT = 8002
 
+    DELIMITER = ':'
+
     # Note: we use environ.get becauase all of these statements get run in
     # every environment, so os.environ['FOOBAR'] will throw an error in
     # development.
 
     # Github API token; used to pull private repos
     GITHUB_API_TOKEN = os.environ.get('GITHUB_API_TOKEN', default='')
+    GITHUB_DOMAIN = 'github.com'
 
-    # The organization URL on Github. The API token is filled in so that
-    # private repos can be pulled
-    GITHUB_ORG = 'https://{}@github.com/data-8/'.format(GITHUB_API_TOKEN)
+    # Default domain to pull from is Github
+    DEFAULT_DOMAIN = GITHUB_DOMAIN
+
+    # A list of domain that can pull from, delimited by DELIMITER
+    ALLOWED_WEB_DOMAINS = os.environ.get(
+        'ALLOWED_WEB_DOMAINS', default=GITHUB_DOMAIN).split(DELIMITER)
+
+    # The default and allowed github account(s) that will be pulled from
+    # , used only with github.com
+    DEFAULT_GITHUB_ACCOUNT = 'data-8'
+    ALLOWED_GITHUB_ACCOUNTS = os.environ.get(
+        'ALLOWED_GITHUB_ACCOUNTS', default=DEFAULT_GITHUB_ACCOUNT).split(DELIMITER)
 
     # The branch that will be pulled in
-    DEFAULT_REPO_BRANCH = 'gh-pages'
     DEFAULT_BRANCH_NAME = 'gh-pages'
 
     # Timeout for authentication token retrieval. Used when checking if
