@@ -30,7 +30,7 @@ from .config import Config
 thread_pool = ThreadPoolExecutor(max_workers=4)
 
 url_args = {
-    'file': fields.Str(),
+    'file_url': fields.Str(),
     'domain': fields.Str(),
     'account': fields.Str(),
     'repo': fields.Str(),
@@ -47,9 +47,11 @@ class LandingHandler(RequestHandler):
     Option 1
     --------
 
-        ?file=public_file_url
+        ?file_url=public_file_url
 
     Example: ?file=http://localhost:8000/README.md
+
+    The domain in the url must be included in the whitelist in config
 
     Downloads file into user's system.
 
@@ -64,7 +66,7 @@ class LandingHandler(RequestHandler):
     """
     @use_args(url_args)
     def get(self, args):
-        is_file_request = ('file' in args)
+        is_file_request = ('file_url' in args)
         # branch name can be omitted for default value
         is_git_request = ('repo' in args and 'path' in args)
         valid_request = xor(is_file_request, is_git_request)
@@ -107,14 +109,14 @@ class RequestHandler(WebSocketHandler):
 
         # We don't do validation since we assume that the LandingHandler did
         # it. TODO: ENHANCE SECURITY
-        is_file_request = ('file' in args)
+        is_file_request = ('file_url' in args)
 
         try:
             if is_file_request:
                 message = yield thread_pool.submit(
                     download_file_and_redirect,
                     username=username,
-                    file_url=args['file'],
+                    file_url=args['file_url'],
                     config=options.config,
                 )
             else:

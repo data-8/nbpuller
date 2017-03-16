@@ -5,7 +5,6 @@ import git
 
 from . import util
 from . import messages
-from .config import Config
 
 
 def pull_from_remote(**kwargs):
@@ -85,18 +84,18 @@ def pull_from_remote(**kwargs):
 
     # Generate repo url
     repo_url = "https://"
-    if domain not in Config.ALLOWED_WEB_DOMAINS:
+    if domain not in config['ALLOWED_WEB_DOMAINS']:
         return messages.error({
             'message': "Specified domain " + domain + " is not allowed.",
             'proceed_url': config['ERROR_REDIRECT_URL']
         })
-    if domain == Config.GITHUB_DOMAIN:
-        if account not in Config.ALLOWED_GITHUB_ACCOUNTS:
+    if domain == config['GITHUB_DOMAIN']:
+        if account not in config['ALLOWED_GITHUB_ACCOUNTS']:
             return messages.error({
                 'message': "Specified github account " + account + " is not allowed.",
                 'proceed_url': config['ERROR_REDIRECT_URL']
             })
-        repo_url += "{}@".format(Config.GITHUB_API_TOKEN) + \
+        repo_url += "{}@".format(config['GITHUB_API_TOKEN']) + \
             domain + "/" + \
             account + '/' + \
             repo_name

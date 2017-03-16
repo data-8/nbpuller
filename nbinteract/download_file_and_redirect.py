@@ -1,6 +1,7 @@
 import os
 from urllib.error import HTTPError
 from urllib.request import urlopen
+import urllib.parse as urlparse
 
 from . import util
 from . import messages
@@ -43,21 +44,23 @@ def download_file_and_redirect(**kwargs):
                  .format(file_url))
         util.logger.exception(error)
         return messages.error({
-                'message': error,
-                'proceed_url': config['ERROR_REDIRECT_URL']
-            })
+            'message': error,
+            'proceed_url': config['ERROR_REDIRECT_URL']
+        })
     except Exception as e:
         error = ('Unhandled error: {}'.format(e))
         util.logger.exception(error)
         return messages.error({
-                'message': error,
-                'proceed_url': config['ERROR_REDIRECT_URL']
-            })
+            'message': error,
+            'proceed_url': config['ERROR_REDIRECT_URL']
+        })
 
 
 def _get_remote_file(config, source):
     """Fetches file, throws an HTTPError if the file is not accessible."""
-    if not source.startswith(config['ALLOWED_DOMAIN']):
+    url_components = urlparse.urlparse(source)
+
+    if url_components.netloc not in config['ALLOWED_URL_DOMAIN']:
         raise ValueError('File not from allowed domain')
 
     return urlopen(source).read().decode('utf-8')

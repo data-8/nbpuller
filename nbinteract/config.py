@@ -59,6 +59,8 @@ class Config(object):
     # This is the url that will be shown to the user if an error occurs
     ERROR_REDIRECT_URL = os.environ.get('ERROR_REDIRECT_URL', default='')
 
+    ALLOWED_URL_DOMAIN = []
+
     def __getitem__(self, attr):
         """
         Temporary hack in order to maintain Flask config-like config usage.
@@ -90,7 +92,12 @@ class ProductionConfig(Config):
     GIT_REDIRECT_PATH = '/user/{username}/tree/{destination}'
 
     # alowed file extensions
-    ALLOWED_FILETYPES = ['ipynb']
+    ALLOWED_FILETYPES = os.environ.get(
+        'ALLOWED_FILETYOES', default="ipynb").split(Config.DELIMITER)
+
+    # allowed direct url download from domain
+    ALLOWED_URL_DOMAIN = os.environ.get(
+        'ALLOWED_URL_DOMAIN', default="").split(Config.DELIMITER)
 
 
 class DevelopmentConfig(Config):
@@ -121,7 +128,7 @@ class DevelopmentConfig(Config):
     GIT_REDIRECT_PATH = '/tree/home/{destination}'
 
     # allowed sources for file parameter in query
-    ALLOWED_DOMAIN = 'http://localhost:8000'
+    ALLOWED_URL_DOMAIN = 'http://localhost:8000'
 
     # base_url for the program
     BASE_URL = 'http://localhost:8002'
@@ -164,7 +171,7 @@ class TestConfig(Config):
     GIT_REDIRECT_PATH = None
 
     # allowed sources for file parameter in query
-    ALLOWED_DOMAIN = 'http://localhost:8000'
+    ALLOWED_URL_DOMAIN = 'http://localhost:8000'
 
     # base_url for the program
     BASE_URL = 'http://localhost:8002'
