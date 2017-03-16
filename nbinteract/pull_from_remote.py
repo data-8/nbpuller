@@ -158,7 +158,7 @@ def _initialize_repo(repo_url, repo_dir, branch_name, config, progress=None):
     Clones repository and configures it to use sparse checkout.
     Extraneous folders will get removed later using git read-tree
     """
-    util.logger.info('Repo {} doesn\'t exist. Cloning...'.format(repo_name))
+    util.logger.info('Repo {} doesn\'t exist. Cloning...'.format(repo_url))
     # Clone repo
     repo = git.Repo.clone_from(
         repo_url,
@@ -172,7 +172,7 @@ def _initialize_repo(repo_url, repo_dir, branch_name, config, progress=None):
     config.set_value('core', 'sparsecheckout', True)
     config.release()
 
-    util.logger.info('Repo {} initialized'.format(repo_name))
+    util.logger.info('Repo {} initialized'.format(repo_url))
 
 
 DELETED_FILE_REGEX = re.compile(

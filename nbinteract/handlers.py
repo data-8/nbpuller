@@ -24,7 +24,7 @@ from . import messages
 from . import util
 from .download_file_and_redirect import download_file_and_redirect
 from .git_progress import Progress
-from nbinteract import pull_from_remote
+from .pull_from_remote import pull_from_remote
 from .config import Config
 
 thread_pool = ThreadPoolExecutor(max_workers=4)
