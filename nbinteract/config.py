@@ -82,8 +82,8 @@ class ProductionConfig(Config):
     # username of user
     USERNAME = os.environ.get('JPY_USER', default='jovyan')
 
-    # where file is copied to
-    COPY_PATH = ''
+    # where file is copied to, by default use current dir
+    COPY_PATH = os.path.realpath('.')
 
     # where users are redirected upon file download success
     FILE_REDIRECT_PATH = '/user/{username}/notebooks/{destination}'
@@ -93,7 +93,7 @@ class ProductionConfig(Config):
 
     # alowed file extensions
     ALLOWED_FILETYPES = os.environ.get(
-        'ALLOWED_FILETYOES', default="ipynb").split(Config.DELIMITER)
+        'ALLOWED_FILETYPES', default="ipynb").split(Config.DELIMITER)
 
     # allowed direct url download from domain
     ALLOWED_URL_DOMAIN = os.environ.get(

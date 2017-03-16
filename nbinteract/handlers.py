@@ -49,7 +49,7 @@ class LandingHandler(RequestHandler):
 
         ?file_url=public_file_url
 
-    Example: ?file=http://localhost:8000/README.md
+    Example: ?file_url=http://localhost:8000/README.md
 
     The domain in the url must be included in the whitelist in config
 
