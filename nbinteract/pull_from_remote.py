@@ -7,15 +7,38 @@ from . import util
 from . import messages
 
 
-def pull_from_github(**kwargs):
+def _generate_repo_url(scheme, domain, account, repo_name, auth_token=''):
+    netloc = None
+    if auth_token:
+        netloc = domain
+    else:
+        netloc = auth_token + '%' + domain
+    if account:
+        account += '/'
+    return "%s://%s/%s%s" % (scheme, netloc, account, repo_name)
+
+
+def pull_from_remote(**kwargs):
     """
-    Initializes git repo if needed, then pulls new content from Github using
+    Initializes git repo if needed, then pulls new content from remote repo using
     sparse checkout.
 
     Redirects the user to the final path provided in the URL. Eg. given a path
     like:
 
         repo=data8assets&branch=gh_pages&path=labs/lab01&path=labs/lab01/lab01.ipynb
+
+    Additional options include: 
+
+    domain (by default domain=github.com)
+    account (only used when domain=github.com, by default account=data-8)
+
+    The result is equivalent to:
+
+    if domain == github.com:    
+        git [clone] https://<API_TOKEN>@<domain>/<account>/<repo>.git
+    else:
+        git [clone] https://<API_TOKEN>@<domain>/<repo>.git
 
     The user will be redirected to the lab01.ipynb notebook in the gh_pages branch
     (and open it).
@@ -30,6 +53,8 @@ def pull_from_github(**kwargs):
     http://jasonkarns.com/blog/subdirectory-checkouts-with-git-sparse-checkout/
 
     Required kwargs:
+        domain (str): Domain to pull from
+        account (str): (Github) account to use
         username (str): The username of the JupyterHub user
         repo_name (str): The repo under the dsten org to pull from, eg.
             textbook or health-connector.
@@ -49,6 +74,8 @@ def pull_from_github(**kwargs):
     config = kwargs['config']
     progress = kwargs['progress']
     notebook_path = kwargs['notebook_path']
+    account = kwargs['account']
+    domain = kwargs['domain']
 
     assert username and repo_name and branch_name and paths and config
 
@@ -57,17 +84,37 @@ def pull_from_github(**kwargs):
 
     util.logger.info('Starting pull.')
     util.logger.info('    User: {}'.format(username))
+    util.logger.info('    Domain: {}'.format(domain))
+    util.logger.info('    Account: {}'.format(account))
     util.logger.info('    Repo: {}'.format(repo_name))
     util.logger.info('    Branch: {}'.format(branch_name))
     util.logger.info('    Paths: {}'.format(paths))
 
     # Retrieve file form the git repository
     repo_dir = util.construct_path(notebook_path, locals(), repo_name)
+    repo_url = ''
+    # Generate repo url
+    if domain not in config['ALLOWED_WEB_DOMAINS']:
+        return messages.error({
+            'message': "Specified domain " + domain + " is not allowed.",
+            'proceed_url': config['ERROR_REDIRECT_URL']
+        })
+    if domain == config['GITHUB_DOMAIN']:
+        if account not in config['ALLOWED_GITHUB_ACCOUNTS']:
+            return messages.error({
+                'message': "Specified github account " + account + " is not allowed.",
+                'proceed_url': config['ERROR_REDIRECT_URL']
+            })
+        repo_url += _generate_repo_url("https", domain,
+                                       account, repo_name, config['GITHUB_API_TOKEN'])
+    else:
+        repo_url += _generate_repo_url("https",
+                                       domain, '', repo_name)
 
     try:
         if not os.path.exists(repo_dir):
             _initialize_repo(
-                repo_name,
+                repo_url,
                 repo_dir,
                 branch_name,
                 config,
@@ -90,7 +137,7 @@ def pull_from_github(**kwargs):
             return messages.status('Pulled from repo: ' + repo_name)
 
         # Redirect to the final path given in the URL
-        destination = os.path.join(repo_dir, paths[-1].replace('*',''))
+        destination = os.path.join(repo_dir, paths[-1].replace('*', ''))
         redirect_url = util.construct_path(config['GIT_REDIRECT_PATH'], {
             'username': username,
             'destination': destination,
@@ -100,9 +147,9 @@ def pull_from_github(**kwargs):
 
     except git.exc.GitCommandError as git_err:
         return messages.error({
-                'message': git_err.stderr,
-                'proceed_url': config['ERROR_REDIRECT_URL']
-            })
+            'message': git_err.stderr,
+            'proceed_url': config['ERROR_REDIRECT_URL']
+        })
 
     finally:
         # Always set ownership to username in case of a git failure
@@ -114,15 +161,15 @@ def pull_from_github(**kwargs):
             util.chown_dir(repo_dir, username)
 
 
-def _initialize_repo(repo_name, repo_dir, branch_name, config, progress=None):
+def _initialize_repo(repo_url, repo_dir, branch_name, config, progress=None):
     """
     Clones repository and configures it to use sparse checkout.
     Extraneous folders will get removed later using git read-tree
     """
-    util.logger.info('Repo {} doesn\'t exist. Cloning...'.format(repo_name))
+    util.logger.info('Repo {} doesn\'t exist. Cloning...'.format(repo_url))
     # Clone repo
     repo = git.Repo.clone_from(
-        config['GITHUB_ORG'] + repo_name,
+        repo_url,
         repo_dir,
         progress,
         branch=branch_name,
@@ -133,7 +180,7 @@ def _initialize_repo(repo_name, repo_dir, branch_name, config, progress=None):
     config.set_value('core', 'sparsecheckout', True)
     config.release()
 
-    util.logger.info('Repo {} initialized'.format(repo_name))
+    util.logger.info('Repo {} initialized'.format(repo_url))
 
 
 DELETED_FILE_REGEX = re.compile(
@@ -182,6 +229,7 @@ def _raise_error_if_git_file_not_exists(repo, branch_name, filename):
 
     result = git_cli.cat_file('-e', 'origin/' + branch_name + ':' + filename)
 
+
 def _add_sparse_checkout_paths(repo_dir, paths):
     """
     Runs the equivalent of
@@ -193,7 +241,7 @@ def _add_sparse_checkout_paths(repo_dir, paths):
     Always makes sure .gitignore is checked out
     """
     sparse_checkout_path = os.path.join(repo_dir,
-                                       '.git', 'info', 'sparse-checkout')
+                                        '.git', 'info', 'sparse-checkout')
 
     existing_paths = []
     try:

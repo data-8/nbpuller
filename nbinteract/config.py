@@ -26,19 +26,30 @@ class Config(object):
 
     PORT = 8002
 
+    DELIMITER = ':'
+
     # Note: we use environ.get becauase all of these statements get run in
     # every environment, so os.environ['FOOBAR'] will throw an error in
     # development.
 
     # Github API token; used to pull private repos
     GITHUB_API_TOKEN = os.environ.get('GITHUB_API_TOKEN', default='')
+    GITHUB_DOMAIN = 'github.com'
 
-    # The organization URL on Github. The API token is filled in so that
-    # private repos can be pulled
-    GITHUB_ORG = 'https://{}@github.com/data-8/'.format(GITHUB_API_TOKEN)
+    # Default domain to pull from is Github
+    DEFAULT_DOMAIN = GITHUB_DOMAIN
+
+    # A list of domain that can pull from, delimited by DELIMITER
+    ALLOWED_WEB_DOMAINS = os.environ.get(
+        'ALLOWED_WEB_DOMAINS', default=GITHUB_DOMAIN).split(DELIMITER)
+
+    # The default and allowed github account(s) that will be pulled from
+    # , used only with github.com
+    DEFAULT_GITHUB_ACCOUNT = 'data-8'
+    ALLOWED_GITHUB_ACCOUNTS = os.environ.get(
+        'ALLOWED_GITHUB_ACCOUNTS', default=DEFAULT_GITHUB_ACCOUNT).split(DELIMITER)
 
     # The branch that will be pulled in
-    DEFAULT_REPO_BRANCH = 'gh-pages'
     DEFAULT_BRANCH_NAME = 'gh-pages'
 
     # Timeout for authentication token retrieval. Used when checking if
@@ -47,6 +58,8 @@ class Config(object):
 
     # This is the url that will be shown to the user if an error occurs
     ERROR_REDIRECT_URL = os.environ.get('ERROR_REDIRECT_URL', default='')
+
+    ALLOWED_URL_DOMAIN = []
 
     def __getitem__(self, attr):
         """
@@ -69,8 +82,8 @@ class ProductionConfig(Config):
     # username of user
     USERNAME = os.environ.get('JPY_USER', default='jovyan')
 
-    # where file is copied to
-    COPY_PATH = ''
+    # where file is copied to, by default use current dir
+    COPY_PATH = os.path.realpath('.')
 
     # where users are redirected upon file download success
     FILE_REDIRECT_PATH = '/user/{username}/notebooks/{destination}'
@@ -79,7 +92,12 @@ class ProductionConfig(Config):
     GIT_REDIRECT_PATH = '/user/{username}/tree/{destination}'
 
     # alowed file extensions
-    ALLOWED_FILETYPES = ['ipynb']
+    ALLOWED_FILETYPES = os.environ.get(
+        'ALLOWED_FILETYPES', default="ipynb").split(Config.DELIMITER)
+
+    # allowed direct url download from domain
+    ALLOWED_URL_DOMAIN = os.environ.get(
+        'ALLOWED_URL_DOMAIN', default="").split(Config.DELIMITER)
 
 
 class DevelopmentConfig(Config):
@@ -110,7 +128,7 @@ class DevelopmentConfig(Config):
     GIT_REDIRECT_PATH = '/tree/home/{destination}'
 
     # allowed sources for file parameter in query
-    ALLOWED_DOMAIN = 'http://localhost:8000'
+    ALLOWED_URL_DOMAIN = 'http://localhost:8000'
 
     # base_url for the program
     BASE_URL = 'http://localhost:8002'
@@ -153,7 +171,7 @@ class TestConfig(Config):
     GIT_REDIRECT_PATH = None
 
     # allowed sources for file parameter in query
-    ALLOWED_DOMAIN = 'http://localhost:8000'
+    ALLOWED_URL_DOMAIN = 'http://localhost:8000'
 
     # base_url for the program
     BASE_URL = 'http://localhost:8002'
