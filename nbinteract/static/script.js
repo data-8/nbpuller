@@ -4,7 +4,7 @@ function showProceedLink(proceed_url) {
     $(".proceed-link").html(proceed_url);
   } else  {
     var domain = document.domain;
-    $(".proceed-link").attr('href', domain);
+    $(".proceed-link").attr('href', "http://" + domain);
     $(".proceed-link").html("http://" + domain);
   }
   $(".proceed-container").show();
