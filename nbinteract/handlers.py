@@ -11,6 +11,7 @@ from os.path import join, dirname
 from operator import xor
 from concurrent.futures import ThreadPoolExecutor
 from notebook.utils import url_path_join
+from notebook.base.handlers import IPythonHandler
 from nbinteract.config import config_for_env
 
 from tornado import gen
@@ -40,7 +41,7 @@ url_args = {
 }
 
 
-class LandingHandler(RequestHandler):
+class LandingHandler(IPythonHandler):
     """
     Landing page containing option to download.
 
@@ -84,7 +85,7 @@ class LandingHandler(RequestHandler):
         socket_args = json.dumps({
             'is_development': options.config['DEBUG'],
             'base_url': options.config['URL'],
-            'username': options.config['USERNAME'],
+            'username': self.get_current_user(),
         })
 
         self.render(
@@ -156,7 +157,7 @@ class RequestHandler(WebSocketHandler):
 
 def setup_handlers(web_app):
     env_name = 'production'
-    config = config_for_env(env_name)
+    config = config_for_env(env_name, web_app.settings['base_url'])
     define('config', config)
 
     settings = dict(
@@ -173,7 +174,7 @@ def setup_handlers(web_app):
 
     socket_url = url_path_join(config['URL'], r'socket/(\S+)')
     host_pattern = '.*'
-    route_pattern = url_path_join(web_app.settings['base_url'], '/interact')
+    route_pattern = url_path_join(config['URL'], '/interact')
     web_app.add_handlers(host_pattern, [
         (route_pattern, LandingHandler),
         (route_pattern + '/', LandingHandler),

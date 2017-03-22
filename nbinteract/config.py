@@ -1,14 +1,14 @@
 import os
 
 
-def config_for_env(env_name):
+def config_for_env(env_name, base_url):
     """
     Takes in an environment and returns a corresponding Config object.
     """
     name_to_env = {
-        'production': ProductionConfig(),
-        'development': DevelopmentConfig(),
-        'testing': TestConfig(),
+        'production': ProductionConfig(base_url),
+        'development': DevelopmentConfig(base_url),
+        'testing': TestConfig(base_url),
     }
 
     return name_to_env[env_name]
@@ -27,6 +27,11 @@ class Config(object):
     PORT = 8002
 
     DELIMITER = ':'
+
+    URL = ''
+
+    def __init__(self, base_url):
+        self.URL = base_url
 
     # Note: we use environ.get becauase all of these statements get run in
     # every environment, so os.environ['FOOBAR'] will throw an error in
@@ -78,9 +83,6 @@ class ProductionConfig(Config):
 
     # URL for users to access. Make sure it has a trailing slash.
     URL = os.environ.get('JPY_BASE_URL', default='') + "/"
-
-    # username of user
-    USERNAME = os.environ.get('JPY_USER', default='jovyan')
 
     # where file is copied to, by default use current dir
     COPY_PATH = os.path.realpath('.')
