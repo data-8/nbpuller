@@ -81,9 +81,6 @@ class ProductionConfig(Config):
     MOCK_AUTH = True
     DEBUG = True
 
-    # URL for users to access. Make sure it has a trailing slash.
-    URL = os.environ.get('JPY_BASE_URL', default='') + "/"
-
     # where file is copied to, by default use current dir
     COPY_PATH = os.path.realpath('.')
 
