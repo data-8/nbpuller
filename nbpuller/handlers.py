@@ -12,7 +12,7 @@ from operator import xor
 from concurrent.futures import ThreadPoolExecutor
 from notebook.utils import url_path_join
 from notebook.base.handlers import IPythonHandler
-from nbinteract.config import config_for_env
+from nbpuller.config import config_for_env
 
 from tornado import gen
 from tornado.options import define, options
@@ -73,7 +73,7 @@ class LandingHandler(IPythonHandler):
         valid_request = xor(is_file_request, is_git_request)
 
         def server_extension_url(url):
-            return 'nbextensions/nbinteract/' + url
+            return 'nbextensions/nbpuller/' + url
 
         if not valid_request:
             self.render('404.html', server_extension_url=server_extension_url,)

@@ -1,7 +1,7 @@
 .DS_Store
 .ipynb_checkpoints
 *.ipynb
-nbinteract/.DS_Store
+nbpuller/.DS_Store
 app
 home
 hub/apt_get_packages.txt

@@ -1,7 +1,7 @@
 define(['jquery'], function ($) {
 
     var readHello = function() {
-        console.log('nbinteract is loaded');
+        console.log('nbpuller is loaded');
     }
 
     var load_ipython_extension = function () {

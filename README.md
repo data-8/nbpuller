@@ -1,18 +1,18 @@
-# nbinteract
-A interact extension for jupyter notebook.
+# nbpuller
+An extension for jupyter notebook to retrieve and update local files from remote git repository using native git pull and merge.
 
 ## Installation
 
 You can currently install this directly from git:
 
 ```
-pip install git+https://github.com/data-8/nbinteract.git
-jupyter serverextension enable --py nbinteract
-jupyter nbextension install --py nbinteract
+pip install git+https://github.com/data-8/nbpuller.git
+jupyter serverextension enable --py nbpuller
+jupyter nbextension install --py nbpuller
 ```
 
 To enable this extension for all notebooks:
 
 ```
-jupyter nbextension enable --py nbinteract
+jupyter nbextension enable --py nbpuller
 ```
