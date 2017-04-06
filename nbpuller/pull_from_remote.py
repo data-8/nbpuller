@@ -12,7 +12,7 @@ def _generate_repo_url(scheme, domain, account, repo_name, auth_token=''):
     if auth_token:
         netloc = domain
     else:
-        netloc = auth_token + '%' + domain
+        netloc = auth_token + '@' + domain
     if account:
         account += '/'
     return "%s://%s/%s%s" % (scheme, netloc, account, repo_name)
