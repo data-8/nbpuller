@@ -9,7 +9,7 @@ from . import messages
 
 def _generate_repo_url(scheme, domain, account, repo_name, auth_token=''):
     netloc = None
-    if auth_token:
+    if not auth_token:
         netloc = domain
     else:
         netloc = auth_token + '@' + domain
