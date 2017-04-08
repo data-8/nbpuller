@@ -82,10 +82,11 @@ class LandingHandler(IPythonHandler):
 
         # These config options are passed into the `openStatusSocket`
         # JS function.
+
         socket_args = json.dumps({
             'is_development': options.config['DEBUG'],
             'base_url': options.config['URL'],
-            'username': self.get_current_user(),
+            'username': str(self.get_current_user()),
         })
 
         self.render(
