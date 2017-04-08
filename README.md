@@ -47,7 +47,7 @@ Alternative setting will be:
 |---------------|--------------------|
 | file_url      | REQUIRED           |
 
-`<file> should be a url. An example is ?file_url=http://localhost/README.md`
+<file> should be a url. An example is `?file_url=http://localhost/README.md`
 
 ## Expected behavior
 
