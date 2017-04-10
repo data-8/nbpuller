@@ -82,7 +82,7 @@ class ProductionConfig(Config):
     DEBUG = True
 
     # where file is copied to, by default use current dir
-    COPY_PATH = os.path.realpath('.')
+    COPY_PATH = ""
 
     # where users are redirected upon file download success
     FILE_REDIRECT_PATH = '/user/{username}/notebooks/{destination}'
