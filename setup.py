@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name="nbpuller",
-    version='0.1.2',
+    version='0.1.3',
     url="https://github.com/data-8/nbpuller",
     author="Data 8 @ UC Berkeley",
     description="Simple Jupyter extension to update files with remote git repository.",

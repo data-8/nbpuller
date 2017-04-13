@@ -28,14 +28,14 @@ def pull_from_remote(**kwargs):
 
         repo=data8assets&branch=gh_pages&path=labs/lab01&path=labs/lab01/lab01.ipynb
 
-    Additional options include: 
+    Additional options include:
 
     domain (by default domain=github.com)
     account (only used when domain=github.com, by default account=data-8)
 
     The result is equivalent to:
 
-    if domain == github.com:    
+    if domain == github.com:
         git [clone] https://<API_TOKEN>@<domain>/<account>/<repo>.git
     else:
         git [clone] https://<API_TOKEN>@<domain>/<repo>.git
@@ -137,7 +137,7 @@ def pull_from_remote(**kwargs):
             return messages.status('Pulled from repo: ' + repo_name)
 
         # Redirect to the final path given in the URL
-        destination = os.path.join(repo_dir, paths[-1].replace('*', ''))
+        destination = os.path.join(notebook_path, repo_name, paths[-1].replace('*', ''))
         redirect_url = util.construct_path(config['GIT_REDIRECT_PATH'], {
             'username': username,
             'destination': destination,
