@@ -85,6 +85,11 @@ class LandingHandler(IPythonHandler):
 
         username = str(self.get_current_user())
 
+        try:
+            username = self.get_current_user().get('name')
+        except Exception as e:
+            pass
+
         util.logger.info("Username: " + username)
 
         socket_args = json.dumps({
