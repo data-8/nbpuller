@@ -19,7 +19,7 @@ jupyter nbextension enable --py nbpuller
 
 ## Usage
 
-nbpuller can be activated through a link in the following format:
+nbpuller can be activated through a HTTP GET request to a link in the following format:
 
 ```
 <notebook_url>/interact?<settings>
@@ -39,7 +39,9 @@ nbpuller can be activated through a link in the following format:
 The remote git repo url is constructed as follows:
 `https://<domain>/<account>/<repo>.git`
 
-Files at each `<path>` of the given branch will be retrieved using git.
+Files or directories at each `<path>` of the given branch will be retrieved using git.
+
+For example, `path=README.md` will retrieve a typical README file, while `path=labs/` would retrieve a directory called `labs` in the root of the git repo.
 
 Alternative setting will be:
 
@@ -47,13 +49,15 @@ Alternative setting will be:
 |---------------|--------------------|
 | file_url      | REQUIRED           |
 
-<file> should be a url. An example is `?file_url=http://localhost/README.md`
+`file_url` should be a url. An example is `?file_url=http://localhost/README.md`
 
 ## Expected behavior
 
 If the destination folder is empty, nbpuller will `git clone` remote repo.
 
 If the destination folder exist, in general, nbpuller tries to do `git pull` and merge with `-Xours` parameter, if necessary. In the case that there is any change in the folder, nbpuller will `git add` all of them and commit them, before pulling and merging.
+
+After files are ready, user will receive a HTTP redirect to the file tree at the last `path` downloaded. In case error, the user will stay at the initial page and see an error output.
 
 ## Cal Blueprint
 
