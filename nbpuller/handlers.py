@@ -83,9 +83,9 @@ class LandingHandler(IPythonHandler):
         # These config options are passed into the `openStatusSocket`
         # JS function.
 
-        username = self.get_current_user()
+        username = str(self.get_current_user())
 
-        self.write_message("Username: " + username)
+        util.logger.info("Username: " + username)
 
         socket_args = json.dumps({
             'is_development': options.config['DEBUG'],
