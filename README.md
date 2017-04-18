@@ -62,7 +62,7 @@ Nbpuller enforces several whitelists for security.
 
 3. Github account whitelist, enforced when pulling from a repo on github. By default, only `data-8` is allowed as an account to pull from. This can be overriden by setting `ALLOWED_GITHUB_ACCOUNTS` variable.
 
-4. Git remote domain whitelist, restricting which domain can the git repo be at. By default, only Githubis allowed. This can be overriden by setting `ALLOWED_WEB_DOMAINS` variable.
+4. Git remote domain whitelist, restricting which domain can the git repo be at. By default, only Github is allowed. This can be overriden by setting `ALLOWED_WEB_DOMAINS` variable.
 
 
 ## Expected behavior
