@@ -185,7 +185,7 @@ def _initialize_repo(repo_url, repo_dir, branch_name, config, progress=None):
 
 DELETED_FILE_REGEX = re.compile(
     r"deleted:\s+"  # Look for deleted: + any amount of whitespace...
-    r"(\S+)"        # and match the filename afterward.
+    r"([^\n\r]+)"        # and match the filename afterward.
 )
 
 
