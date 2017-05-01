@@ -92,7 +92,7 @@ class ProductionConfig(Config):
 
     # alowed file extensions
     ALLOWED_FILETYPES = os.environ.get(
-        'ALLOWED_FILETYPES', default="ipynb").split(Config.DELIMITER)
+        'ALLOWED_FILETYPES', default="ipynb:Rmd").split(Config.DELIMITER)
 
     # allowed direct url download from domain
     ALLOWED_URL_DOMAIN = os.environ.get(
@@ -135,7 +135,7 @@ class DevelopmentConfig(Config):
     SERVER_NAME = 'localhost:8002'
 
     # allowed file extensions
-    ALLOWED_FILETYPES = ['ipynb']
+    ALLOWED_FILETYPES = ['ipynb', 'Rmd']
 
     # Timeout for authentication token retrieval. Used when checking if
     # notebook exists under user's account
@@ -176,4 +176,4 @@ class TestConfig(Config):
     BASE_URL = 'http://localhost:8002'
 
     # allowed file extensions
-    ALLOWED_FILETYPES = ['ipynb']
+    ALLOWED_FILETYPES = ['ipynb', 'Rmd']
