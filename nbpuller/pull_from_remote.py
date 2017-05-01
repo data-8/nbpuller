@@ -128,8 +128,8 @@ def pull_from_remote(**kwargs):
 
         _add_sparse_checkout_paths(repo_dir, paths)
 
-        _reset_deleted_files(repo)
-        _make_commit_if_dirty(repo)
+        _reset_deleted_files(repo, branch_name)
+        _make_commit_if_dirty(repo, repo_dir)
 
         _pull_and_resolve_conflicts(repo, branch_name, progress=progress)
 
@@ -188,8 +188,13 @@ DELETED_FILE_REGEX = re.compile(
     r"([^\n\r]+)"        # and match the filename afterward.
 )
 
+ADDED_FILE_REGEX = re.compile(
+    r"new file:\s+"  # Look for deleted: + any amount of whitespace...
+    r"([^\n\r]+)"    # and match the filename afterward.
+)
 
-def _reset_deleted_files(repo):
+
+def _reset_deleted_files(repo, branch_name):
     """
     Runs the equivalent of git checkout -- <file> for each file that was
     deleted. This allows us to delete a file, hit an interact link, then get a
@@ -199,8 +204,15 @@ def _reset_deleted_files(repo):
     deleted_files = DELETED_FILE_REGEX.findall(git_cli.status())
 
     if deleted_files:
-        cleaned_filenames = [_clean_path(filename)
-                             for filename in deleted_files]
+        cleaned_filenames = []
+
+        for filename in deleted_files:
+            try:
+                _raise_error_if_git_file_not_exists(repo, branch_name, filename)
+                cleaned_filenames.append(_clean_path(filename))
+            except git.exc.GitCommandError as git_err:
+                pass
+
         git_cli.checkout('--', *cleaned_filenames)
         util.logger.info('Resetted these files: {}'.format(deleted_files))
 
@@ -259,6 +271,7 @@ def _add_sparse_checkout_paths(repo_dir, paths):
     paths_with_gitignore = ['.gitignore'] + paths
     to_write = [path for path in paths_with_gitignore
                 if path not in existing_paths]
+
     with open(sparse_checkout_path, 'a') as info_file:
         for path in to_write:
             info_file.write('/{}\n'.format(_clean_path(path)))
@@ -266,13 +279,31 @@ def _add_sparse_checkout_paths(repo_dir, paths):
     util.logger.info('{} written to sparse-checkout'.format(to_write))
 
 
-def _make_commit_if_dirty(repo):
+def _make_commit_if_dirty(repo, repo_dir):
     """
     Makes a commit with message 'WIP' if there are changes.
     """
     if repo.is_dirty():
         git_cli = repo.git
         git_cli.add('-A')
+
+        added_files = ADDED_FILE_REGEX.findall(git_cli.status())
+
+        if added_files:
+            sparse_checkout_path = os.path.join(repo_dir,
+                                        '.git', 'info', 'sparse-checkout')
+
+            try:
+                open(sparse_checkout_path, 'r')
+            except FileNotFoundError:
+                open(sparse_checkout_path, 'w')
+
+            with open(sparse_checkout_path, 'a') as info_file:
+                for path in added_files:
+                    info_file.write('/{}\n'.format(_clean_path(path)))
+
+            util.logger.info('Added these files: {}'.format(added_files))
+
         git_cli.commit('-m', 'WIP')
 
         util.logger.info('Made WIP commit')
