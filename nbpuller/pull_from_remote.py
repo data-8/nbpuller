@@ -183,11 +183,6 @@ def _initialize_repo(repo_url, repo_dir, branch_name, config, progress=None):
 
     # Use sparse checkout
 
-    #sparse_checkout_path = os.path.join(repo_dir,
-    #                                    '.git', 'info', 'sparse-checkout')
-
-    #open(sparse_checkout_path, 'w')
-
     config = repo.config_writer()
     config.set_value('core', 'sparsecheckout', True)
     config.release()
