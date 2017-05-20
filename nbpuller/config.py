@@ -44,6 +44,10 @@ class Config(object):
     # Default domain to pull from is Github
     DEFAULT_DOMAIN = GITHUB_DOMAIN
 
+    # Name of file that has list of repos to automatically pull
+    AUTO_PULL_LIST_FILE_NAME = os.environ.get(
+        'AUTO_PULL_LIST_FILE_NAME', default='.autopull_list')
+
     # A list of domain that can pull from, delimited by DELIMITER
     ALLOWED_WEB_DOMAINS = os.environ.get(
         'ALLOWED_WEB_DOMAINS', default=GITHUB_DOMAIN).split(DELIMITER)

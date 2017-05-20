@@ -7,6 +7,7 @@
 """
 import json
 import os
+
 from os.path import join, dirname
 from operator import xor
 from concurrent.futures import ThreadPoolExecutor
@@ -27,6 +28,7 @@ from .download_file_and_redirect import download_file_and_redirect
 from .git_progress import Progress
 from .pull_from_remote import pull_from_remote
 from .config import Config
+from .auto_pull import loop_auto_pulling
 
 thread_pool = ThreadPoolExecutor(max_workers=4)
 
@@ -190,3 +192,5 @@ def setup_handlers(web_app):
         (route_pattern + '/', LandingHandler),
         (socket_url, RequestHandler)
     ])
+
+    loop_auto_pulling(thread_pool)

@@ -2,6 +2,7 @@ import os
 import re
 
 import git
+from tornado.gen import coroutine
 
 from . import util
 from . import messages
@@ -16,7 +17,6 @@ def _generate_repo_url(scheme, domain, account, repo_name, auth_token=''):
     if account:
         account += '/'
     return "%s://%s/%s%s" % (scheme, netloc, account, repo_name)
-
 
 def pull_from_remote(**kwargs):
     """
@@ -95,12 +95,15 @@ def pull_from_remote(**kwargs):
     repo_url = ''
     # Generate repo url
     if domain not in config['ALLOWED_WEB_DOMAINS']:
+        util.logger.info("Allowed domains: " + str(config['ALLOWED_WEB_DOMAINS']))
+        util.logger.exception("Specified domain " + domain + " is not allowed.")
         return messages.error({
             'message': "Specified domain " + domain + " is not allowed.",
             'proceed_url': config['ERROR_REDIRECT_URL']
         })
     if domain == config['GITHUB_DOMAIN']:
         if account not in config['ALLOWED_GITHUB_ACCOUNTS']:
+            util.logger.exception("Specified github account " + account + " is not allowed.")
             return messages.error({
                 'message': "Specified github account " + account + " is not allowed.",
                 'proceed_url': config['ERROR_REDIRECT_URL']
@@ -111,7 +114,11 @@ def pull_from_remote(**kwargs):
         repo_url += _generate_repo_url("https",
                                        domain, '', repo_name)
 
+    util.logger.info('Pull step 1')
+
     try:
+        _update_auto_pull_file(config, repo_name, domain, account, branch_name)
+
         if not os.path.exists(repo_dir):
             _initialize_repo(
                 repo_url,
@@ -121,20 +128,28 @@ def pull_from_remote(**kwargs):
                 progress=progress,
             )
 
+        util.logger.info('Pull step 2')
+
         repo = git.Repo(repo_dir)
 
         for path in paths:
             _raise_error_if_git_file_not_exists(repo, branch_name, path)
+
+        util.logger.info('Pull step 3')
 
         _add_sparse_checkout_paths(repo_dir, paths)
 
         _reset_deleted_files(repo, branch_name)
         _make_commit_if_dirty(repo, repo_dir)
 
+        util.logger.info('Pull step 4')
+
         _pull_and_resolve_conflicts(repo, branch_name, progress=progress)
 
         if not config['GIT_REDIRECT_PATH']:
             return messages.status('Pulled from repo: ' + repo_name)
+
+        util.logger.info('Pull step 5')
 
         # Redirect to the final path given in the URL
         destination = os.path.join(notebook_path, repo_name, paths[-1].replace('*', ''))
@@ -146,6 +161,7 @@ def pull_from_remote(**kwargs):
         return messages.redirect(redirect_url)
 
     except git.exc.GitCommandError as git_err:
+        util.logger.exception(git_err.stderr)
         return messages.error({
             'message': git_err.stderr,
             'proceed_url': config['ERROR_REDIRECT_URL']
@@ -176,6 +192,12 @@ def _initialize_repo(repo_url, repo_dir, branch_name, config, progress=None):
     )
 
     # Use sparse checkout
+
+    #sparse_checkout_path = os.path.join(repo_dir,
+    #                                    '.git', 'info', 'sparse-checkout')
+
+    #open(sparse_checkout_path, 'w')
+
     config = repo.config_writer()
     config.set_value('core', 'sparsecheckout', True)
     config.release()
@@ -192,6 +214,27 @@ ADDED_FILE_REGEX = re.compile(
     r"new file:\s+"  # Look for deleted: + any amount of whitespace...
     r"([^\n\r]+)"    # and match the filename afterward.
 )
+
+
+def _update_auto_pull_file(config, repo_name, domain, account, branch_name):
+    file_name = config["AUTO_PULL_LIST_FILE_NAME"]
+
+    existing_pulls = []
+    try:
+        auto_pull_file = open(file_name, 'r')
+        with auto_pull_file as auto_file:
+            existing_pulls = [line.strip() for line in auto_file.readlines()]
+    except FileNotFoundError:
+        open(file_name, 'w')
+
+    util.logger.info(
+        'Existing pulls in {}: {}'.format(file_name, existing_pulls))
+
+    new_pull = "{},{},{},{}".format(repo_name, domain, account, branch_name)
+
+    if new_pull not in existing_pulls:
+        with open(file_name, 'a') as auto_file:
+            auto_file.write('{}\n'.format(new_pull))
 
 
 def _reset_deleted_files(repo, branch_name):
