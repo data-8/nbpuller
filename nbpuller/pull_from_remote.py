@@ -2,7 +2,6 @@ import os
 import re
 
 import git
-from tornado.gen import coroutine
 
 from . import util
 from . import messages
