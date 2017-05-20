@@ -114,8 +114,6 @@ def pull_from_remote(**kwargs):
         repo_url += _generate_repo_url("https",
                                        domain, '', repo_name)
 
-    util.logger.info('Pull step 1')
-
     try:
         _update_auto_pull_file(config, repo_name, domain, account, branch_name)
 
@@ -128,28 +126,20 @@ def pull_from_remote(**kwargs):
                 progress=progress,
             )
 
-        util.logger.info('Pull step 2')
-
         repo = git.Repo(repo_dir)
 
         for path in paths:
             _raise_error_if_git_file_not_exists(repo, branch_name, path)
-
-        util.logger.info('Pull step 3')
 
         _add_sparse_checkout_paths(repo_dir, paths)
 
         _reset_deleted_files(repo, branch_name)
         _make_commit_if_dirty(repo, repo_dir)
 
-        util.logger.info('Pull step 4')
-
         _pull_and_resolve_conflicts(repo, branch_name, progress=progress)
 
         if not config['GIT_REDIRECT_PATH']:
             return messages.status('Pulled from repo: ' + repo_name)
-
-        util.logger.info('Pull step 5')
 
         # Redirect to the final path given in the URL
         destination = os.path.join(notebook_path, repo_name, paths[-1].replace('*', ''))
