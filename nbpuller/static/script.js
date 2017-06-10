@@ -42,14 +42,15 @@ function openStatusSocket(socket_args) {
   var is_development = socket_args['is_development'];
   var base_url = socket_args['base_url'];
   var username = socket_args['username'];
-
+  var is_ssl = window.location.protocol == 'https:';
+  
   // Constructs a URL that looks like:
   //
   // ws://<host>/<base_url>/socket/<username>?<params>
   //
   // Uses wss in production.
   var url = [
-    is_development ? 'ws://' : 'wss://',
+    is_ssl ? 'wss://' : 'ws://',
     window.location.hostname,
     ':',
     window.location.port,
