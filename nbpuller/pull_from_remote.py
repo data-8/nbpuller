@@ -123,12 +123,15 @@ def pull_from_remote(**kwargs):
 
         repo = git.Repo(repo_dir)
 
-        for path in paths:
-            _raise_error_if_git_file_not_exists(repo, branch_name, path)
+        if '*' not in paths and not _all_files_exist_in_repo(repo, branch_name, paths):
+            return messages.error({
+                'message': "One of the following paths does not exist upstrem: {}".format(paths),
+                'proceed_url': config['ERROR_REDIRECT_URL']
+            })
 
         _add_sparse_checkout_paths(repo_dir, paths)
 
-        _reset_deleted_files(repo, branch_name)
+        _reset_deleted_files(repo, branch_name, progress=progress)
         _make_commit_if_dirty(repo, repo_dir)
 
         _pull_and_resolve_conflicts(repo, branch_name, progress=progress)
@@ -194,7 +197,7 @@ ADDED_FILE_REGEX = re.compile(
 )
 
 
-def _reset_deleted_files(repo, branch_name):
+def _reset_deleted_files(repo, branch_name, progress=None):
     """
     Runs the equivalent of git checkout -- <file> for each file that was
     deleted. This allows us to delete a file, hit an interact link, then get a
@@ -204,17 +207,15 @@ def _reset_deleted_files(repo, branch_name):
     deleted_files = DELETED_FILE_REGEX.findall(git_cli.status())
 
     if deleted_files:
-        cleaned_filenames = []
+        cleaned_filenames = [_clean_path(filename) for filename in _get_existing_paths(repo, branch_name, deleted_files)]
+        for filename in cleaned_filenames:
+            git_cli.checkout(branch_name, '--', filename)
 
-        for filename in deleted_files:
-            try:
-                _raise_error_if_git_file_not_exists(repo, branch_name, filename)
-                cleaned_filenames.append(_clean_path(filename))
-            except git.exc.GitCommandError as git_err:
-                pass
-
-        git_cli.checkout('--', *cleaned_filenames)
-        util.logger.info('Resetted these files: {}'.format(deleted_files))
+            message = 'Reset: {}'.format(filename)
+            if progress:
+                progress.line_dropped(message)
+            else:
+                util.logger.info(message)
 
 
 def _clean_path(path):
@@ -226,7 +227,7 @@ def _clean_path(path):
     return path.replace(' ', '\ ')
 
 
-def _raise_error_if_git_file_not_exists(repo, branch_name, filename):
+def _get_existing_paths(repo, branch_name, filenames):
     """
     Checks to see if the file or directory actually exists in the remote repo
     using: git cat-file -e origin/<branch_name>:<filename>
@@ -239,7 +240,19 @@ def _raise_error_if_git_file_not_exists(repo, branch_name, filename):
     except git.exc.GitCommandError as git_err:
         pass
 
-    result = git_cli.cat_file('-e', 'origin/' + branch_name + ':' + filename)
+    existing_files = []
+    for filename in filenames:
+        try:
+            git_cli.cat_file('-e', 'origin/' + branch_name + ':' + filename)
+            existing_files.append(filename)
+        except:
+            pass
+
+    return existing_files
+
+
+def _all_files_exist_in_repo(repo, branch_name, files):
+    return len(files) == len(_get_existing_paths(repo, branch_name, files))
 
 
 def _add_sparse_checkout_paths(repo_dir, paths):
