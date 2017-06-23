@@ -8,7 +8,7 @@ setuptools.setup(
     description="Simple Jupyter extension to update files with remote git repository.",
     packages=setuptools.find_packages(),
     install_requires=[
-        'notebook', 'pytest', 'webargs', 'requests', 'gitpython', 'toolz', 'urllib'
+        'notebook', 'pytest', 'webargs', 'requests', 'gitpython', 'toolz'
     ],
     package_data={'nbpuller': ['static/*']},
 )
