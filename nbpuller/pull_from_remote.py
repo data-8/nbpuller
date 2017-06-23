@@ -1,5 +1,6 @@
 import os
 import re
+import urllib
 
 import git
 
@@ -142,8 +143,8 @@ def pull_from_remote(**kwargs):
         # Redirect to the final path given in the URL
         destination = os.path.join(notebook_path, repo_name, paths[-1].replace('*', ''))
         redirect_url = util.construct_path(config['GIT_REDIRECT_PATH'], {
-            'username': username,
-            'destination': destination,
+            'username': urllib.parse.quote_plus(username),
+            'destination': urllib.parse.quote_plus(destination),
         })
         util.logger.info('Redirecting to {}'.format(redirect_url))
         return messages.redirect(redirect_url)
