@@ -1,3 +1,7 @@
+# DEPRECATED
+
+This extension is deprecated, please use [nbgitpuller](https://github.com/data-8/nbgitpuller) instead.
+
 # nbpuller
 An extension for jupyter notebook to retrieve and update local files from remote git repository using native git pull and merge.
 
